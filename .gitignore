@@ -1,0 +1,24 @@
+# Java / Maven
+target/
+*.class
+
+# H2
+*.mv.db
+*.trace.db
+backend/data/
+
+# Node / Vite
+node_modules/
+dist/
+
+# Variables de entorno
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
