@@ -249,32 +249,26 @@ Posteriormente podrá evaluarse también el despliegue del backend si resulta vi
 
 ## Documentación
 
-La documentación correspondiente a la primera entrega se encuentra en:
+La documentación se encuentra organizada por instancias dentro de `docs/`.
 
-**docs/entrega-1/**
-
-El documento principal es:
-
-**Trabajo_Final_Primera_Entrega.pdf**
-
-La documentación se irá actualizando durante las distintas etapas del proyecto.
+- **Primera entrega:** `docs/entrega-1/Trabajo_Final_Primera_Entrega.pdf`
+- **Segunda entrega:** `docs/entrega-2/arquitectura-y-modulos.md`
+- **Esquema SQL:** `database/schema.sql`
 
 ## Estado actual
 
-El proyecto se encuentra en etapa de definición del MVP, arquitectura y modelo de datos.
+El proyecto se encuentra en la etapa de **Arquitectura y Módulos**, correspondiente a la segunda entrega.
 
-Actualmente se encuentran definidos:
+A esta instancia se encuentran definidos:
 
-- problemática y propuesta de solución;
-- alcance;
-- Producto Mínimo Viable;
+- problemática, propuesta, alcance y MVP;
 - roles y responsabilidades;
 - circuito de órdenes de trabajo;
 - estados y transiciones;
-- modelo conceptual preliminar;
-- tecnologías;
-- arquitectura;
-- estructura del repositorio;
+- modelo conceptual y modelo relacional;
+- esquema SQL para H2;
+- arquitectura general;
+- módulos del MVP y funcionalidades complementarias;
 - planificación del desarrollo.
 
 La implementación del backend y frontend se realizará progresivamente de acuerdo con el plan de trabajo.
