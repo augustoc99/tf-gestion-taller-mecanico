@@ -19,10 +19,14 @@ public class OrdenTrabajo {
     // @ManyToOne
     // @JoinColumn(name = "id_vehiculo", nullable = false)
     // private Vehiculo vehiculo;
+    @Column(name = "id_vehiculo")  // Solución temporal
+    private Integer idVehiculo;
 
     // @ManyToOne
     // @JoinColumn(name = "id_mecanico")
     // private Usuario mecanico;
+    @Column(name = "id_mecanico")  // Solución temporal
+    private Integer idMecanico;
 
     private LocalDateTime fechaIngreso;
     private LocalDateTime fechaEgreso;
