@@ -1,8 +1,13 @@
 package com.taller.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "orden_trabajo")
 public class OrdenTrabajo {
@@ -27,20 +32,4 @@ public class OrdenTrabajo {
     private String estado;
     private String observaciones;
 
-    public Integer getIdOrden() { return idOrden; }
-    public void setIdOrden(Integer idOrden) { this.idOrden = idOrden; }
-    public LocalDateTime getFechaIngreso() { return fechaIngreso; }
-    public void setFechaIngreso(LocalDateTime fechaIngreso) { this.fechaIngreso = fechaIngreso; }
-    public LocalDateTime getFechaEgreso() { return fechaEgreso; }
-    public void setFechaEgreso(LocalDateTime fechaEgreso) { this.fechaEgreso = fechaEgreso; }
-    public Integer getKilometrajeIngreso() { return kilometrajeIngreso; }
-    public void setKilometrajeIngreso(Integer kilometrajeIngreso) { this.kilometrajeIngreso = kilometrajeIngreso; }
-    public String getProblemaInformado() { return problemaInformado; }
-    public void setProblemaInformado(String problemaInformado) { this.problemaInformado = problemaInformado; }
-    public String getDiagnostico() { return diagnostico; }
-    public void setDiagnostico(String diagnostico) { this.diagnostico = diagnostico; }
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
-    public String getObservaciones() { return observaciones; }
-    public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
 }

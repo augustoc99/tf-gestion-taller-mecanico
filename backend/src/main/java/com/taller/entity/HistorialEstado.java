@@ -1,8 +1,13 @@
 package com.taller.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "historial_estado")
 public class HistorialEstado {
@@ -25,16 +30,4 @@ public class HistorialEstado {
 
     private String observacion;
 
-    public Integer getIdHistorial() { return idHistorial; }
-    public void setIdHistorial(Integer idHistorial) { this.idHistorial = idHistorial; }
-    public OrdenTrabajo getOrden() { return orden; }
-    public void setOrden(OrdenTrabajo orden) { this.orden = orden; }
-    public String getEstadoAnterior() { return estadoAnterior; }
-    public void setEstadoAnterior(String estadoAnterior) { this.estadoAnterior = estadoAnterior; }
-    public String getEstadoNuevo() { return estadoNuevo; }
-    public void setEstadoNuevo(String estadoNuevo) { this.estadoNuevo = estadoNuevo; }
-    public LocalDateTime getFechaCambio() { return fechaCambio; }
-    public void setFechaCambio(LocalDateTime fechaCambio) { this.fechaCambio = fechaCambio; }
-    public String getObservacion() { return observacion; }
-    public void setObservacion(String observacion) { this.observacion = observacion; }
 }
