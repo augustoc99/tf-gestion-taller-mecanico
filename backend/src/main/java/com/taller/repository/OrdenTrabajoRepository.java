@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface OrdenTrabajoRepository extends JpaRepository<OrdenTrabajo, Integer> {
     List<OrdenTrabajo> findByEstado(String estado);
+    // List<OrdenTrabajo> findByVehiculoIdVehiculoOrderByFechaIngresoDesc(Integer idVehiculo);
 }

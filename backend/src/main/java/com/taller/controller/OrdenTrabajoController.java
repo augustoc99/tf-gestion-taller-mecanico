@@ -13,12 +13,13 @@ import java.util.List;
 public class OrdenTrabajoController {
 
     private final OrdenTrabajoService service;
+    private final com.taller.service.TrabajoRealizadoService trabajoService;
 
-    public OrdenTrabajoController(OrdenTrabajoService service) {
+    public OrdenTrabajoController(OrdenTrabajoService service, com.taller.service.TrabajoRealizadoService trabajoService) {
         this.service = service;
+        this.trabajoService = trabajoService;
     }
 
-    // DTOs simples como records (Java 17)
     public record CambioEstadoRequest(String estadoNuevo, String observacion) {}
     public record AsignarMecanicoRequest(Integer idMecanico) {}
 
@@ -64,5 +65,17 @@ public class OrdenTrabajoController {
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/trabajos")
+    public com.taller.entity.TrabajoRealizado agregarTrabajo(
+            @PathVariable Integer id,
+            @RequestBody com.taller.entity.TrabajoRealizado trabajo) {
+        return trabajoService.agregar(id, trabajo);
+    }
+
+    @GetMapping("/{id}/trabajos")
+    public java.util.List<com.taller.entity.TrabajoRealizado> listarTrabajos(@PathVariable Integer id) {
+        return trabajoService.listarPorOrden(id);
     }
 }

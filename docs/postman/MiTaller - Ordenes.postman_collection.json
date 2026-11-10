@@ -62,7 +62,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/ordenes/1",
+          "raw": "http://localhost:8080/api/ordenes/3",
           "protocol": "http",
           "host": [
             "localhost"
@@ -71,7 +71,7 @@
           "path": [
             "api",
             "ordenes",
-            "1"
+            "3"
           ]
         }
       },
@@ -92,7 +92,7 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/ordenes/1",
+          "raw": "http://localhost:8080/api/ordenes/3",
           "protocol": "http",
           "host": [
             "localhost"
@@ -101,7 +101,7 @@
           "path": [
             "api",
             "ordenes",
-            "1"
+            "3"
           ]
         }
       },
@@ -149,6 +149,174 @@
             "api",
             "ordenes",
             "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Cambiar Estado",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"EN_DIAGNOSTICO\",\r\n  \"observacion\": \"Ingreso a diagnóstico\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/ordenes/3/estado",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "ordenes",
+            "3",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Cambiar Estado Inválido",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"FINALIZADO\",\r\n  \"observacion\": \"Intento saltar estados\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/ordenes/3/estado",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "ordenes",
+            "3",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT Asignar Mecánico",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"idMecanico\": 2\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/ordenes/3/mecanico",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "ordenes",
+            "3",
+            "mecanico"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Historial de Orden",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/ordenes/3/historial",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "ordenes",
+            "3",
+            "historial"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST Agregar Trabajo",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"descripcion\": \"Cambio de bieletas delanteras\",\r\n  \"manoObraHoras\": 1.5,\r\n  \"repuestosUtilizados\": \"2 bieletas, 4 tornillos\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/ordenes/3/trabajos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "ordenes",
+            "3",
+            "trabajos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET Trabajos de Orden",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/ordenes/3/trabajos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "ordenes",
+            "3",
+            "trabajos"
           ]
         }
       },
