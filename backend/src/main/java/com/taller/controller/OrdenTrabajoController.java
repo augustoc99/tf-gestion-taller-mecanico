@@ -1,5 +1,6 @@
 package com.taller.controller;
 
+import com.taller.entity.HistorialEstado;
 import com.taller.entity.OrdenTrabajo;
 import com.taller.service.OrdenTrabajoService;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,10 @@ public class OrdenTrabajoController {
     public OrdenTrabajoController(OrdenTrabajoService service) {
         this.service = service;
     }
+
+    // DTOs simples como records (Java 17)
+    public record CambioEstadoRequest(String estadoNuevo, String observacion) {}
+    public record AsignarMecanicoRequest(Integer idMecanico) {}
 
     @GetMapping
     public List<OrdenTrabajo> listar(@RequestParam(required = false) String estado) {
@@ -38,6 +43,21 @@ public class OrdenTrabajoController {
     @PutMapping("/{id}")
     public OrdenTrabajo actualizar(@PathVariable Integer id, @RequestBody OrdenTrabajo orden) {
         return service.actualizar(id, orden);
+    }
+
+    @PutMapping("/{id}/estado")
+    public OrdenTrabajo cambiarEstado(@PathVariable Integer id, @RequestBody CambioEstadoRequest req) {
+        return service.cambiarEstado(id, req.estadoNuevo(), req.observacion());
+    }
+
+    @PutMapping("/{id}/mecanico")
+    public OrdenTrabajo asignarMecanico(@PathVariable Integer id, @RequestBody AsignarMecanicoRequest req) {
+        return service.asignarMecanico(id, req.idMecanico());
+    }
+
+    @GetMapping("/{id}/historial")
+    public List<HistorialEstado> historial(@PathVariable Integer id) {
+        return service.obtenerHistorial(id);
     }
 
     @DeleteMapping("/{id}")
