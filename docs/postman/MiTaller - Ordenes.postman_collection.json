@@ -1,20 +1,31 @@
 {
   "info": {
-    "_postman_id": "5c9aa84f-e8f5-4258-b529-65e40459564d",
-    "name": "MiTaller - Ordenes",
+    "_postman_id": "babd5475-319a-47e1-834d-c5ec7a7d9d65",
+    "name": "MiTaller - Flujo completo",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "51518425",
-    "_collection_link": "https://go.postman.co/collection/51518425-5c9aa84f-e8f5-4258-b529-65e40459564d?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/51518425-babd5475-319a-47e1-834d-c5ec7a7d9d65?source=collection_link"
   },
   "item": [
     {
-      "name": "POST Crear Orden",
+      "name": "01 - Crear usuario administrador",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\npm.collectionVariables.set('idUsuarioAdmin', body.idUsuario);\r\nconsole.log('idUsuarioAdmin =', body.idUsuario);"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"idVehiculo\": 1,\r\n  \"kilometrajeIngreso\": 85000,\r\n  \"problemaInformado\": \"Ruido tren delantero\"\r\n}",
+          "raw": "{\r\n  \"nombreCompleto\": \"Ana Recepción\",\r\n  \"email\": \"ana@taller.com\",\r\n  \"rol\": \"RECEPCION_ADMINISTRACION\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -22,69 +33,36 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/ordenes",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/usuarios",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
-            "api",
-            "ordenes"
+            "usuarios"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "GET Listar Ordenes",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/api/ordenes",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "ordenes"
-          ]
+      "name": "02 - Crear usuario mecánico",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\npm.collectionVariables.set('idUsuarioMecanico', body.idUsuario);\r\nconsole.log('idUsuarioMecanico =', body.idUsuario);"
+            ]
+          }
         }
-      },
-      "response": []
-    },
-    {
-      "name": "GET Orden por ID",
+      ],
       "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/api/ordenes/3",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "ordenes",
-            "3"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "PUT Actualizar Orden",
-      "request": {
-        "method": "PUT",
+        "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"kilometrajeIngreso\": 86000,\r\n  \"problemaInformado\": \"Ruido tren delantero actualizado\",\r\n  \"diagnostico\": \"Bieletas desgastadas\",\r\n  \"observaciones\": \"Revisar también alineación\"\r\n}",
+          "raw": "{\r\n  \"nombreCompleto\": \"Pablo Mecánico\",\r\n  \"email\": \"pablo@taller.com\",\r\n  \"rol\": \"MECANICO\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -92,35 +70,178 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/ordenes/3",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/usuarios",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
-            "api",
-            "ordenes",
-            "3"
+            "usuarios"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "GET Ordenes por Estado",
+      "name": "03 - Crear cliente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\npm.collectionVariables.set('idCliente', body.idCliente);\r\nconsole.log('idCliente =', body.idCliente);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nombre\": \"Juan Gómez\",\r\n  \"dniCuit\": \"20123456789\",\r\n  \"telefono\": \"1145678900\",\r\n  \"email\": \"juan@mail.com\",\r\n  \"direccion\": \"Av. Siempre Viva 123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/clientes",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "clientes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Crear vehículo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\npm.collectionVariables.set('idVehiculo', body.idVehiculo);\r\nconsole.log('idVehiculo =', body.idVehiculo);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"patente\": \"AB123CD\",\r\n  \"marca\": \"Toyota\",\r\n  \"modelo\": \"Hilux\",\r\n  \"anio\": 2020,\r\n  \"idCliente\": {{idCliente}}\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/vehiculos",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehiculos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Crear orden de trabajo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\npm.collectionVariables.set('idOrden', body.idOrden);\r\nconsole.log('idOrden =', body.idOrden);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"idVehiculo\": {{idVehiculo}},\r\n  \"idMecanico\": {{idUsuarioMecanico}},\r\n  \"kilometrajeIngreso\": 85000,\r\n  \"motivoIngreso\": \"Ruido en tren delantero\",\r\n  \"observaciones\": \"Revisar alineación\",\r\n  \"idUsuarioResponsable\": {{idUsuarioAdmin}}\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 - Listar todas las órdenes",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));\r\npm.test('Devuelve array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/ordenes?estado=RECIBIDO",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/ordenes",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
-            "api",
+            "ordenes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 - Filtrar órdenes por estado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));\r\npm.test('Todas en RECIBIDO', () => {\r\n  pm.response.json().forEach(o => pm.expect(o.estado).to.eql('RECIBIDO'));\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/ordenes?estado=RECIBIDO",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
             "ordenes"
           ],
           "query": [
@@ -134,34 +255,72 @@
       "response": []
     },
     {
-      "name": "DELETE Orden",
+      "name": "08 - Obtener detalle de orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));\r\npm.test('Estado RECIBIDO', () => pm.expect(pm.response.json().estado).to.eql('RECIBIDO'));"
+            ]
+          }
+        }
+      ],
       "request": {
-        "method": "DELETE",
+        "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/ordenes/1",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
-            "api",
             "ordenes",
-            "1"
+            "{{idOrden}}"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "PUT Cambiar Estado",
+      "name": "09 - Listar órdenes de un vehículo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/vehiculo/{{idVehiculo}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "vehiculo",
+            "{{idVehiculo}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10 - Asignar mecánico a la orden",
       "request": {
         "method": "PUT",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"estadoNuevo\": \"EN_DIAGNOSTICO\",\r\n  \"observacion\": \"Ingreso a diagnóstico\"\r\n}",
+          "raw": "{\r\n  \"idMecanico\": {{idUsuarioMecanico}},\r\n  \"idUsuarioResponsable\": {{idUsuarioAdmin}}\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -169,78 +328,13 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/ordenes/3/estado",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/mecanico",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
-            "api",
             "ordenes",
-            "3",
-            "estado"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "PUT Cambiar Estado Inválido",
-      "request": {
-        "method": "PUT",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"estadoNuevo\": \"FINALIZADO\",\r\n  \"observacion\": \"Intento saltar estados\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8080/api/ordenes/3/estado",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "ordenes",
-            "3",
-            "estado"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "PUT Asignar Mecánico",
-      "request": {
-        "method": "PUT",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"idMecanico\": 2\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8080/api/ordenes/3/mecanico",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "ordenes",
-            "3",
+            "{{idOrden}}",
             "mecanico"
           ]
         }
@@ -248,35 +342,13 @@
       "response": []
     },
     {
-      "name": "GET Historial de Orden",
+      "name": "11 - Actualizar datos de ingreso",
       "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/api/ordenes/3/historial",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "ordenes",
-            "3",
-            "historial"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "POST Agregar Trabajo",
-      "request": {
-        "method": "POST",
+        "method": "PUT",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"descripcion\": \"Cambio de bieletas delanteras\",\r\n  \"manoObraHoras\": 1.5,\r\n  \"repuestosUtilizados\": \"2 bieletas, 4 tornillos\"\r\n}",
+          "raw": "{\r\n  \"kilometrajeIngreso\": 86000,\r\n  \"motivoIngreso\": \"Ruido y vibración en curvas\",\r\n  \"observaciones\": \"Cliente reporta además\",\r\n  \"idUsuarioResponsable\": {{idUsuarioAdmin}}\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -284,16 +356,108 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/ordenes/3/trabajos",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/ingreso",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
-            "api",
             "ordenes",
-            "3",
+            "{{idOrden}}",
+            "ingreso"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "12 - Cambiar estado a En Diagnóstico",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado EN_DIAGNOSTICO', () => pm.expect(pm.response.json().estado).to.eql('EN_DIAGNOSTICO'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"EN_DIAGNOSTICO\",\r\n  \"idUsuarioResponsable\": {{idUsuarioMecanico}},\r\n  \"observacion\": \"Ingreso a diagnóstico\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/estado",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "13 - Registrar diagnóstico técnico",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"diagnostico\": \"Bieletas delanteras desgastadas\",\r\n  \"observaciones\": \"Recomiendo alinear también\",\r\n  \"idUsuarioResponsable\": {{idUsuarioMecanico}}\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/tecnica",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "tecnica"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "14 - Agregar trabajo realizado",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"descripcion\": \"Cambio de bieletas delanteras\",\r\n  \"idUsuarioResponsable\": {{idUsuarioMecanico}}\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/trabajos",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
             "trabajos"
           ]
         }
@@ -301,26 +465,337 @@
       "response": []
     },
     {
-      "name": "GET Trabajos de Orden",
+      "name": "15 - Listar trabajos de la orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Tiene al menos 1 trabajo', () => pm.expect(pm.response.json().length).to.be.gte(1));"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/ordenes/3/trabajos",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/trabajos",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
-            "api",
             "ordenes",
-            "3",
+            "{{idOrden}}",
             "trabajos"
           ]
         }
       },
       "response": []
+    },
+    {
+      "name": "16 - Cambiar estado a En Reparación",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado EN_REPARACION', () => pm.expect(pm.response.json().estado).to.eql('EN_REPARACION'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"EN_REPARACION\",\r\n  \"idUsuarioResponsable\": {{idUsuarioMecanico}},\r\n  \"observacion\": \"Inicia reparación\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/estado",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "17 - Cambiar estado a Control Final",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado CONTROL_FINAL', () => pm.expect(pm.response.json().estado).to.eql('CONTROL_FINAL'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"CONTROL_FINAL\",\r\n  \"idUsuarioResponsable\": {{idUsuarioMecanico}},\r\n  \"observacion\": \"Reparación terminada, pasa a control\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/estado",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "18 - Cambiar estado a Finalizado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estado FINALIZADO', () => pm.expect(pm.response.json().estado).to.eql('FINALIZADO'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"FINALIZADO\",\r\n  \"idUsuarioResponsable\": {{idUsuarioMecanico}},\r\n  \"observacion\": \"Pasó el control de calidad\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/estado",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "19 - Cambiar estado a Entregado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\npm.test('Estado ENTREGADO', () => pm.expect(body.estado).to.eql('ENTREGADO'));\r\npm.test('Tiene fechaEntrega', () => pm.expect(body.fechaEntrega).to.not.be.null);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"ENTREGADO\",\r\n  \"idUsuarioResponsable\": {{idUsuarioAdmin}},\r\n  \"observacion\": \"Cliente retira el vehículo\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/estado",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "20 - Consultar historial de la orden",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\npm.test('Historial tiene 6 registros', () => pm.expect(body.length).to.eql(6));\r\npm.test('Cada registro tiene usuario', () => {\r\n  body.forEach(h => {\r\n    pm.expect(h.nombreUsuario).to.be.a('string');\r\n    pm.expect(h.rolUsuario).to.be.a('string');\r\n  });\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/historial",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "historial"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "21 - Transición inválida (409)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 409', () => pm.response.to.have.status(409));\r\npm.test('Error TRANSICION_INVALIDA', () => {\r\n  pm.expect(pm.response.json().error).to.eql('TRANSICION_INVALIDA');\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"estadoNuevo\": \"RECIBIDO\",\r\n  \"idUsuarioResponsable\": {{idUsuarioAdmin}},\r\n  \"observacion\": \"Intento volver atrás\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/{{idOrden}}/estado",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "{{idOrden}}",
+            "estado"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "22 - Orden inexistente (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/ordenes/999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ordenes",
+            "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "23 - Listar los usuarios existentes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/usuarios?rol=MECANICO",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "usuarios"
+          ],
+          "query": [
+            {
+              "key": "rol",
+              "value": "MECANICO"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api"
+    },
+    {
+      "key": "idUsuarioAdmin",
+      "value": ""
+    },
+    {
+      "key": "idUsuarioMecanico",
+      "value": "2"
+    },
+    {
+      "key": "idCliente",
+      "value": ""
+    },
+    {
+      "key": "idVehiculo",
+      "value": ""
+    },
+    {
+      "key": "idOrden",
+      "value": ""
     }
   ]
 }
