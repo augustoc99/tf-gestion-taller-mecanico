@@ -7,7 +7,7 @@ const ESTADOS = [
   'ESPERANDO_REPUESTO', 'CONTROL_FINAL', 'FINALIZADO', 'ENTREGADO',
 ];
 
-export default function OrdenesListPage() {
+export default function PaginaListaOrdenes() {
   const [ordenes, setOrdenes] = useState([]);
   const [estado, setEstado] = useState('');
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ export default function OrdenesListPage() {
     const url = estado ? `/ordenes?estado=${estado}` : '/ordenes';
     api.get(url)
       .then((r) => { if (activo) setOrdenes(r.data); })
-      .catch((e) => { if (activo) setError(e.message); })
+      .catch((e) => { if (activo) setError(e.response?.data?.detalle || e.message); })
       .finally(() => { if (activo) setLoading(false); });
     return () => { activo = false; };
   }, [estado]);
@@ -40,7 +40,7 @@ export default function OrdenesListPage() {
           }}
         >
           <option value="">Todos</option>
-          {ESTADOS.map((s) => <option key={s} value={s}>{s}</option>)}
+          {ESTADOS.map((s) => <option key={s} value={s}>{s.replaceAll('_', ' ')}</option>)}
         </select>
       </div>
       {ordenes.length === 0 ? (
@@ -50,7 +50,8 @@ export default function OrdenesListPage() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Vehículo</th>
+              <th>Patente</th>
+              <th>Cliente</th>
               <th>Estado</th>
               <th>Fecha ingreso</th>
               <th></th>
@@ -60,9 +61,10 @@ export default function OrdenesListPage() {
             {ordenes.map((o) => (
               <tr key={o.idOrden}>
                 <td>{o.idOrden}</td>
-                <td>{o.idVehiculo ?? '—'}</td>
-                <td>{o.estado}</td>
-                <td>{o.fechaIngreso}</td>
+                <td>{o.patenteVehiculo ?? '—'}</td>
+                <td>{o.nombreCliente ?? '—'}</td>
+                <td>{o.estado.replaceAll('_', ' ')}</td>
+                <td>{o.fechaIngreso?.replace('T', ' ').slice(0, 16) ?? '—'}</td>
                 <td><Link to={`/ordenes/${o.idOrden}`}>Ver</Link></td>
               </tr>
             ))}
