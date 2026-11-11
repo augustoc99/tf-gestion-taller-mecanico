@@ -2,6 +2,7 @@ package com.taller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,7 +24,15 @@ public class GlobalExceptionHandler {
                 "campos", campos
         ));
     }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleUnreadableJson(
+            HttpMessageNotReadableException ex) {
 
+        return ResponseEntity.badRequest().body(Map.of(
+                "error", "JSON_INVALIDO",
+                "detalle", "El cuerpo JSON no es valido o contiene una codificacion incorrecta."
+        ));
+    }
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException ex) {
         String mensaje = ex.getMessage() == null ? "" : ex.getMessage();

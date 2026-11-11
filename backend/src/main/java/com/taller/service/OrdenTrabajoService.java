@@ -1,8 +1,9 @@
 package com.taller.service;
 
-import com.taller.dto.ActualizarOrdenRequest;
+import com.taller.dto.ActualizarIngresoOrdenRequest;
 import com.taller.dto.CambioEstadoRequest;
 import com.taller.dto.CrearOrdenRequest;
+import com.taller.dto.RegistrarDatosTecnicosRequest;
 import com.taller.entity.*;
 import com.taller.repository.HistorialEstadoOrdenRepository;
 import com.taller.repository.OrdenTrabajoRepository;
@@ -12,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class OrdenTrabajoService {
@@ -26,6 +29,13 @@ public class OrdenTrabajoService {
             EstadoOrden.CONTROL_FINAL, List.of(EstadoOrden.EN_REPARACION, EstadoOrden.FINALIZADO),
             EstadoOrden.FINALIZADO, List.of(EstadoOrden.ENTREGADO),
             EstadoOrden.ENTREGADO, List.of()
+    );
+
+    private static final Set<EstadoOrden> ESTADOS_DATOS_TECNICOS = EnumSet.of(
+            EstadoOrden.EN_DIAGNOSTICO,
+            EstadoOrden.EN_REPARACION,
+            EstadoOrden.ESPERANDO_REPUESTO,
+            EstadoOrden.CONTROL_FINAL
     );
 
     private final OrdenTrabajoRepository ordenRepo;
@@ -52,6 +62,13 @@ public class OrdenTrabajoService {
         return ordenRepo.findByEstadoOrderByFechaIngresoDesc(estado);
     }
 
+    public List<OrdenTrabajo> listarPorVehiculo(Long idVehiculo) {
+        if (!vehiculoRepo.existsById(idVehiculo)) {
+            throw new RuntimeException("Vehículo no encontrado: " + idVehiculo);
+        }
+        return ordenRepo.findByVehiculo_IdVehiculoOrderByFechaIngresoDesc(idVehiculo);
+    }
+
     public OrdenTrabajo obtener(Long id) {
         return ordenRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada: " + id));
@@ -59,6 +76,8 @@ public class OrdenTrabajoService {
 
     @Transactional
     public OrdenTrabajo crear(CrearOrdenRequest req) {
+        obtenerRecepcionActiva(req.idUsuarioResponsable());
+
         Vehiculo vehiculo = vehiculoRepo.findById(req.idVehiculo())
                 .orElseThrow(() -> new RuntimeException("Vehículo no encontrado: " + req.idVehiculo()));
 
@@ -79,15 +98,31 @@ public class OrdenTrabajoService {
     }
 
     @Transactional
-    public OrdenTrabajo actualizar(Long id, ActualizarOrdenRequest req) {
+    public OrdenTrabajo actualizarIngreso(Long id, ActualizarIngresoOrdenRequest req) {
+        obtenerRecepcionActiva(req.idUsuarioResponsable());
+
         OrdenTrabajo orden = obtener(id);
-        if (orden.getEstado() == EstadoOrden.ENTREGADO) {
-            throw new RuntimeException("No se puede modificar una orden ENTREGADA");
+        if (orden.getEstado() != EstadoOrden.RECIBIDO) {
+            throw new RuntimeException("No se puede modificar el ingreso una vez iniciada la etapa técnica");
         }
 
         orden.setKilometrajeIngreso(req.kilometrajeIngreso());
         orden.setMotivoIngreso(req.motivoIngreso().trim());
-        orden.setDiagnostico(limpiar(req.diagnostico()));
+        orden.setObservaciones(limpiar(req.observaciones()));
+        return ordenRepo.save(orden);
+    }
+
+    @Transactional
+    public OrdenTrabajo registrarDatosTecnicos(Long id, RegistrarDatosTecnicosRequest req) {
+        OrdenTrabajo orden = obtener(id);
+        Usuario responsable = obtenerUsuarioActivo(req.idUsuarioResponsable());
+        validarMecanicoAsignado(orden, responsable);
+
+        if (!ESTADOS_DATOS_TECNICOS.contains(orden.getEstado())) {
+            throw new RuntimeException("No se pueden registrar datos técnicos en el estado " + orden.getEstado());
+        }
+
+        orden.setDiagnostico(req.diagnostico().trim());
         orden.setObservaciones(limpiar(req.observaciones()));
         return ordenRepo.save(orden);
     }
@@ -117,10 +152,12 @@ public class OrdenTrabajoService {
     }
 
     @Transactional
-    public OrdenTrabajo asignarMecanico(Long idOrden, Long idMecanico) {
+    public OrdenTrabajo asignarMecanico(Long idOrden, Long idMecanico, Long idUsuarioResponsable) {
+        obtenerRecepcionActiva(idUsuarioResponsable);
+
         OrdenTrabajo orden = obtener(idOrden);
-        if (orden.getEstado() == EstadoOrden.ENTREGADO) {
-            throw new RuntimeException("No se puede reasignar una orden ENTREGADA");
+        if (orden.getEstado() == EstadoOrden.FINALIZADO || orden.getEstado() == EstadoOrden.ENTREGADO) {
+            throw new RuntimeException("No se puede asignar o reasignar un mecánico a una orden cerrada");
         }
 
         orden.setMecanico(obtenerMecanicoValido(idMecanico));
@@ -141,12 +178,32 @@ public class OrdenTrabajoService {
         return usuario;
     }
 
+    private Usuario obtenerRecepcionActiva(Long idUsuario) {
+        Usuario usuario = obtenerUsuarioActivo(idUsuario);
+        if (usuario.getRol() != RolUsuario.RECEPCION_ADMINISTRACION) {
+            throw new RuntimeException("Sólo Recepción/Administración puede realizar esta operación");
+        }
+        return usuario;
+    }
+
     private Usuario obtenerMecanicoValido(Long idMecanico) {
         Usuario mecanico = obtenerUsuarioActivo(idMecanico);
         if (mecanico.getRol() != RolUsuario.MECANICO) {
             throw new RuntimeException("El usuario asignado debe tener rol MECANICO");
         }
         return mecanico;
+    }
+
+    private void validarMecanicoAsignado(OrdenTrabajo orden, Usuario responsable) {
+        if (responsable.getRol() != RolUsuario.MECANICO) {
+            throw new RuntimeException("Los datos técnicos debe registrarlos un usuario MECANICO");
+        }
+        if (orden.getMecanico() == null) {
+            throw new RuntimeException("Debe asignarse un mecánico antes de realizar operaciones técnicas");
+        }
+        if (!orden.getMecanico().getIdUsuario().equals(responsable.getIdUsuario())) {
+            throw new RuntimeException("Sólo el mecánico asignado puede realizar operaciones técnicas sobre la orden");
+        }
     }
 
     private void validarResponsableTransicion(OrdenTrabajo orden, EstadoOrden nuevo, Usuario responsable) {
@@ -157,17 +214,7 @@ public class OrdenTrabajoService {
             return;
         }
 
-        if (responsable.getRol() != RolUsuario.MECANICO) {
-            throw new RuntimeException("Los estados técnicos debe gestionarlos un usuario MECANICO");
-        }
-
-        if (orden.getMecanico() == null) {
-            throw new RuntimeException("Debe asignarse un mecánico antes de iniciar el diagnóstico");
-        }
-
-        if (!orden.getMecanico().getIdUsuario().equals(responsable.getIdUsuario())) {
-            throw new RuntimeException("Sólo el mecánico asignado puede gestionar los estados técnicos de la orden");
-        }
+        validarMecanicoAsignado(orden, responsable);
     }
 
     private void registrarHistorial(

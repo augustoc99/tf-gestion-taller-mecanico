@@ -10,5 +10,6 @@ public record CrearOrdenRequest(
         Long idMecanico,
         @NotNull @PositiveOrZero Integer kilometrajeIngreso,
         @NotBlank @Size(max = 1000) String motivoIngreso,
-        @Size(max = 2000) String observaciones
+        @Size(max = 2000) String observaciones,
+        @NotNull Long idUsuarioResponsable
 ) {}

@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-public record ActualizarOrdenRequest(
+public record ActualizarIngresoOrdenRequest(
         @NotNull @PositiveOrZero Integer kilometrajeIngreso,
         @NotBlank @Size(max = 1000) String motivoIngreso,
-        @Size(max = 2000) String diagnostico,
-        @Size(max = 2000) String observaciones
+        @Size(max = 2000) String observaciones,
+        @NotNull Long idUsuarioResponsable
 ) {}

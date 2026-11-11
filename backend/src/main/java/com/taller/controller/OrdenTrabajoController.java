@@ -1,10 +1,7 @@
 package com.taller.controller;
 
 import com.taller.dto.*;
-import com.taller.entity.DetalleTrabajo;
 import com.taller.entity.EstadoOrden;
-import com.taller.entity.HistorialEstadoOrden;
-import com.taller.entity.OrdenTrabajo;
 import com.taller.service.DetalleTrabajoService;
 import com.taller.service.OrdenTrabajoService;
 import jakarta.validation.Valid;
@@ -25,49 +22,81 @@ public class OrdenTrabajoController {
     }
 
     @GetMapping
-    public List<OrdenTrabajo> listar(@RequestParam(required = false) EstadoOrden estado) {
-        return estado == null ? ordenService.listar() : ordenService.listarPorEstado(estado);
+    public List<OrdenTrabajoResponse> listar(@RequestParam(required = false) EstadoOrden estado) {
+        return (estado == null ? ordenService.listar() : ordenService.listarPorEstado(estado))
+                .stream()
+                .map(OrdenTrabajoResponse::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public OrdenTrabajo obtener(@PathVariable Long id) {
-        return ordenService.obtener(id);
+    public OrdenTrabajoResponse obtener(@PathVariable Long id) {
+        return OrdenTrabajoResponse.from(ordenService.obtener(id));
+    }
+
+    @GetMapping("/vehiculo/{idVehiculo}")
+    public List<OrdenTrabajoResponse> listarPorVehiculo(@PathVariable Long idVehiculo) {
+        return ordenService.listarPorVehiculo(idVehiculo)
+                .stream()
+                .map(OrdenTrabajoResponse::from)
+                .toList();
     }
 
     @PostMapping
-    public OrdenTrabajo crear(@Valid @RequestBody CrearOrdenRequest req) {
-        return ordenService.crear(req);
+    public OrdenTrabajoResponse crear(@Valid @RequestBody CrearOrdenRequest req) {
+        return OrdenTrabajoResponse.from(ordenService.crear(req));
     }
 
-    @PutMapping("/{id}")
-    public OrdenTrabajo actualizar(@PathVariable Long id, @Valid @RequestBody ActualizarOrdenRequest req) {
-        return ordenService.actualizar(id, req);
+    @PutMapping("/{id}/ingreso")
+    public OrdenTrabajoResponse actualizarIngreso(
+            @PathVariable Long id,
+            @Valid @RequestBody ActualizarIngresoOrdenRequest req) {
+        return OrdenTrabajoResponse.from(ordenService.actualizarIngreso(id, req));
+    }
+
+    @PutMapping("/{id}/tecnica")
+    public OrdenTrabajoResponse registrarDatosTecnicos(
+            @PathVariable Long id,
+            @Valid @RequestBody RegistrarDatosTecnicosRequest req) {
+        return OrdenTrabajoResponse.from(ordenService.registrarDatosTecnicos(id, req));
     }
 
     @PutMapping("/{id}/estado")
-    public OrdenTrabajo cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambioEstadoRequest req) {
-        return ordenService.cambiarEstado(id, req);
+    public OrdenTrabajoResponse cambiarEstado(
+            @PathVariable Long id,
+            @Valid @RequestBody CambioEstadoRequest req) {
+        return OrdenTrabajoResponse.from(ordenService.cambiarEstado(id, req));
     }
 
     @PutMapping("/{id}/mecanico")
-    public OrdenTrabajo asignarMecanico(@PathVariable Long id, @Valid @RequestBody AsignarMecanicoRequest req) {
-        return ordenService.asignarMecanico(id, req.idMecanico());
+    public OrdenTrabajoResponse asignarMecanico(
+            @PathVariable Long id,
+            @Valid @RequestBody AsignarMecanicoRequest req) {
+        return OrdenTrabajoResponse.from(
+                ordenService.asignarMecanico(id, req.idMecanico(), req.idUsuarioResponsable())
+        );
     }
 
     @GetMapping("/{id}/historial")
-    public List<HistorialEstadoOrden> historial(@PathVariable Long id) {
-        return ordenService.obtenerHistorial(id);
+    public List<HistorialEstadoResponse> historial(@PathVariable Long id) {
+        return ordenService.obtenerHistorial(id)
+                .stream()
+                .map(HistorialEstadoResponse::from)
+                .toList();
     }
 
     @PostMapping("/{id}/trabajos")
-    public DetalleTrabajo agregarTrabajo(
+    public DetalleTrabajoResponse agregarTrabajo(
             @PathVariable Long id,
             @Valid @RequestBody AgregarDetalleTrabajoRequest req) {
-        return detalleService.agregar(id, req);
+        return DetalleTrabajoResponse.from(detalleService.agregar(id, req));
     }
 
     @GetMapping("/{id}/trabajos")
-    public List<DetalleTrabajo> listarTrabajos(@PathVariable Long id) {
-        return detalleService.listarPorOrden(id);
+    public List<DetalleTrabajoResponse> listarTrabajos(@PathVariable Long id) {
+        return detalleService.listarPorOrden(id)
+                .stream()
+                .map(DetalleTrabajoResponse::from)
+                .toList();
     }
 }
