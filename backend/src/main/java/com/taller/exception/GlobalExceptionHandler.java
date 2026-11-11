@@ -32,6 +32,10 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "NO_ENCONTRADO", "detalle", mensaje));
         }
+        if (mensaje.contains("Ya existe")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "CONFLICTO", "detalle", mensaje));
+        }
         if (mensaje.contains("Transición inválida")) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("error", "TRANSICION_INVALIDA", "detalle", mensaje));
