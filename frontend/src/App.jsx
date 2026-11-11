@@ -5,6 +5,8 @@ import PaginaListaClientes from './paginas/clientes/PaginaListaClientes';
 import PaginaCrearOrden from './paginas/ordenes/PaginaCrearOrden';
 import PaginaDetalleOrden from './paginas/ordenes/PaginaDetalleOrden';
 import PaginaListaOrdenes from './paginas/ordenes/PaginaListaOrdenes';
+import PaginaFormularioVehiculo from './paginas/vehiculos/PaginaFormularioVehiculo';
+import PaginaListaVehiculos from './paginas/vehiculos/PaginaListaVehiculos';
 
 export default function App() {
   return (
@@ -21,6 +23,10 @@ export default function App() {
         <Route path="/clientes" element={<PaginaListaClientes />} />
         <Route path="/clientes/nuevo" element={<PaginaFormularioCliente />} />
         <Route path="/clientes/:id/editar" element={<PaginaFormularioCliente />} />
+
+        <Route path="/vehiculos" element={<PaginaListaVehiculos />} />
+        <Route path="/vehiculos/nuevo" element={<PaginaFormularioVehiculo />} />
+        <Route path="/vehiculos/:id/editar" element={<PaginaFormularioVehiculo />} />
       </Routes>
     </BrowserRouter>
   );

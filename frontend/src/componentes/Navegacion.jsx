@@ -17,6 +17,13 @@ export default function Navegacion() {
       >
         Clientes
       </NavLink>
+
+      <NavLink
+        to="/vehiculos"
+        className={({ isActive }) => (isActive ? 'activo' : undefined)}
+      >
+        Vehículos
+      </NavLink>
     </nav>
   );
 }

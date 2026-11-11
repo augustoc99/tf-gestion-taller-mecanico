@@ -1,0 +1,83 @@
+.pagina-vehiculos {
+  width: min(1100px, calc(100% - 36px));
+  margin: 32px auto;
+}
+
+.pagina-vehiculos h1 {
+  margin-top: 0;
+}
+
+.pagina-vehiculos p {
+  line-height: 1.4;
+}
+
+.filtros-vehiculos {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(240px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 22px;
+}
+
+.filtros-vehiculos label,
+.formulario-vehiculo label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filtros-vehiculos input,
+.filtros-vehiculos select,
+.formulario-vehiculo input,
+.formulario-vehiculo select {
+  padding: 8px 9px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font: inherit;
+}
+
+.acciones-filtros {
+  display: flex;
+  gap: 8px;
+}
+
+.acciones-filtros button,
+.formulario-vehiculo button {
+  padding: 8px 12px;
+}
+
+.tabla-vehiculos {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-vehiculos th,
+.tabla-vehiculos td {
+  padding: 9px 10px;
+  border: 1px solid #999;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabla-vehiculos th {
+  background: #f4f4f4;
+}
+
+.pagina-formulario-vehiculo {
+  max-width: 720px;
+}
+
+.pagina-formulario-vehiculo h1 {
+  margin-top: 22px;
+}
+
+.formulario-vehiculo {
+  display: grid;
+  gap: 15px;
+}
+
+@media (max-width: 780px) {
+  .filtros-vehiculos {
+    grid-template-columns: 1fr;
+  }
+}
