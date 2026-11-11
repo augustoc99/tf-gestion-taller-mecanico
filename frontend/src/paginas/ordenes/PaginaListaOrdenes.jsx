@@ -28,7 +28,12 @@ export default function PaginaListaOrdenes() {
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>Órdenes de trabajo</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Órdenes de trabajo</h1>
+        <Link to="/ordenes/nueva">
+          <button style={{ padding: '8px 16px' }}>+ Nueva orden</button>
+        </Link>
+      </div>
       <div style={{ marginBottom: 10 }}>
         <label>Filtrar por estado: </label>
         <select
