@@ -1,16 +1,52 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import api from '../../api/axios';
-import SelectorEstado from '../../componentes/ordenes/SelectorEstado';
 import FormTrabajo from '../../componentes/ordenes/FormTrabajo';
+import SelectorEstado from '../../componentes/ordenes/SelectorEstado';
 
-const ID_USUARIO_RESPONSABLE = 1;
+function obtenerMensajeError(error) {
+  const data = error?.response?.data;
+
+  if (typeof data === 'string' && data.trim()) {
+    return data;
+  }
+
+  if (data?.detalle) {
+    return data.detalle;
+  }
+
+  if (data?.message) {
+    return data.message;
+  }
+
+  if (data?.error && typeof data.error === 'string') {
+    return data.error;
+  }
+
+  return error?.message || 'No se pudo completar la operación.';
+}
+
+function etiquetaRol(rol) {
+  if (rol === 'RECEPCION_ADMINISTRACION') {
+    return 'Recepción / Administración';
+  }
+
+  if (rol === 'MECANICO') {
+    return 'Mecánico';
+  }
+
+  return rol;
+}
 
 export default function PaginaDetalleOrden() {
   const { id } = useParams();
+
   const [orden, setOrden] = useState(null);
   const [historial, setHistorial] = useState([]);
   const [trabajos, setTrabajos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [mecanicos, setMecanicos] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState(null);
@@ -18,6 +54,7 @@ export default function PaginaDetalleOrden() {
   const [diagnostico, setDiagnostico] = useState('');
   const [obsTecnica, setObsTecnica] = useState('');
   const [idMecanico, setIdMecanico] = useState('');
+  const [idUsuarioResponsable, setIdUsuarioResponsable] = useState('');
 
   const recargar = async () => {
     const [o, h, t] = await Promise.all([
@@ -25,94 +62,156 @@ export default function PaginaDetalleOrden() {
       api.get(`/ordenes/${id}/historial`),
       api.get(`/ordenes/${id}/trabajos`),
     ]);
+
     setOrden(o.data);
     setHistorial(h.data);
     setTrabajos(t.data);
     setDiagnostico(o.data.diagnostico || '');
+
+    if (o.data.idMecanico) {
+      setIdMecanico(String(o.data.idMecanico));
+    }
   };
 
   useEffect(() => {
     let activo = true;
+
     Promise.all([
       api.get(`/ordenes/${id}`),
       api.get(`/ordenes/${id}/historial`),
       api.get(`/ordenes/${id}/trabajos`),
+      api.get('/usuarios'),
+      api.get('/usuarios/mecanicos'),
     ])
-      .then(([o, h, t]) => {
-        if (!activo) return;
+      .then(([o, h, t, u, m]) => {
+        if (!activo) {
+          return;
+        }
+
+        const usuariosActivos = u.data.filter((usuario) => usuario.activo);
+
         setOrden(o.data);
         setHistorial(h.data);
         setTrabajos(t.data);
+        setUsuarios(usuariosActivos);
+        setMecanicos(m.data);
         setDiagnostico(o.data.diagnostico || '');
+
+        if (o.data.idMecanico) {
+          setIdMecanico(String(o.data.idMecanico));
+        }
+
+        const mecanicoAsignadoActivo = usuariosActivos.find(
+          (usuario) => usuario.idUsuario === o.data.idMecanico && usuario.rol === 'MECANICO',
+        );
+
+        const recepcionActiva = usuariosActivos.find(
+          (usuario) => usuario.rol === 'RECEPCION_ADMINISTRACION',
+        );
+
+        const responsableInicial = mecanicoAsignadoActivo || recepcionActiva || usuariosActivos[0];
+
+        if (responsableInicial) {
+          setIdUsuarioResponsable(String(responsableInicial.idUsuario));
+        }
       })
-      .catch((e) => {
-        if (activo) setError(e.response?.data?.detalle || e.message);
+      .catch((err) => {
+        if (activo) {
+          setError(obtenerMensajeError(err));
+        }
       })
       .finally(() => {
-        if (activo) setLoading(false);
+        if (activo) {
+          setLoading(false);
+        }
       });
-    return () => { activo = false; };
+
+    return () => {
+      activo = false;
+    };
   }, [id]);
 
-  const ejecutar = async (fn, exito) => {
+  async function ejecutar(fn, exito) {
     setError(null);
     setMensaje(null);
+
+    if (!idUsuarioResponsable) {
+      setError('Seleccioná el usuario actual antes de realizar la acción.');
+      return;
+    }
+
     try {
       await fn();
       await recargar();
       setMensaje(exito);
-    } catch (e) {
-      setError(e.response?.data?.detalle || e.message);
+    } catch (err) {
+      setError(obtenerMensajeError(err));
     }
-  };
+  }
 
   const cambiarEstado = (estadoNuevo, observacion) =>
     ejecutar(
       () => api.put(`/ordenes/${id}/estado`, {
         estadoNuevo,
-        idUsuarioResponsable: ID_USUARIO_RESPONSABLE,
+        idUsuarioResponsable: Number(idUsuarioResponsable),
         observacion: observacion || null,
       }),
-      `Estado cambiado a ${estadoNuevo.replaceAll('_', ' ')}`
+      `Estado cambiado a ${estadoNuevo.replaceAll('_', ' ')}`,
     );
 
   const agregarTrabajo = (descripcion) =>
     ejecutar(
       () => api.post(`/ordenes/${id}/trabajos`, {
         descripcion,
-        idUsuarioResponsable: ID_USUARIO_RESPONSABLE,
+        idUsuarioResponsable: Number(idUsuarioResponsable),
       }),
-      'Trabajo agregado'
+      'Trabajo agregado',
     );
 
-  const guardarDiagnostico = (e) => {
-    e.preventDefault();
-    if (!diagnostico.trim()) return;
+  function guardarDiagnostico(event) {
+    event.preventDefault();
+
+    if (!diagnostico.trim()) {
+      return;
+    }
+
     ejecutar(
       () => api.put(`/ordenes/${id}/tecnica`, {
         diagnostico: diagnostico.trim(),
-        observaciones: obsTecnica || null,
-        idUsuarioResponsable: ID_USUARIO_RESPONSABLE,
+        observaciones: obsTecnica.trim() || null,
+        idUsuarioResponsable: Number(idUsuarioResponsable),
       }),
-      'Diagnóstico guardado'
+      'Diagnóstico guardado',
     );
-  };
+  }
 
-  const asignarMecanico = (e) => {
-    e.preventDefault();
-    if (!idMecanico) return;
+  function asignarMecanico(event) {
+    event.preventDefault();
+
+    if (!idMecanico) {
+      return;
+    }
+
     ejecutar(
       () => api.put(`/ordenes/${id}/mecanico`, {
         idMecanico: Number(idMecanico),
-        idUsuarioResponsable: ID_USUARIO_RESPONSABLE,
+        idUsuarioResponsable: Number(idUsuarioResponsable),
       }),
-      'Mecánico asignado'
+      'Mecánico asignado',
     );
-  };
+  }
 
-  if (loading) return <p style={{ padding: 20 }}>Cargando...</p>;
-  if (error && !orden) return <p style={{ padding: 20, color: 'red' }}>Error: {error}</p>;
-  if (!orden) return <p style={{ padding: 20 }}>Orden no encontrada.</p>;
+  if (loading) {
+    return <p style={{ padding: 20 }}>Cargando...</p>;
+  }
+
+  if (error && !orden) {
+    return <p style={{ padding: 20, color: 'red' }}>Error: {error}</p>;
+  }
+
+  if (!orden) {
+    return <p style={{ padding: 20 }}>Orden no encontrada.</p>;
+  }
 
   const entregada = orden.estado === 'ENTREGADO';
 
@@ -125,11 +224,31 @@ export default function PaginaDetalleOrden() {
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <section style={{ border: '1px solid #ddd', padding: 12, marginBottom: 16 }}>
+        <h2>Usuario actual</h2>
+        <p style={{ marginTop: 0 }}>
+          Seleccioná quién realiza las acciones para que el backend aplique las reglas de rol.
+        </p>
+
+        <select
+          value={idUsuarioResponsable}
+          onChange={(event) => setIdUsuarioResponsable(event.target.value)}
+          style={{ width: '100%', padding: 7 }}
+        >
+          <option value="">Seleccionar usuario</option>
+          {usuarios.map((usuario) => (
+            <option key={usuario.idUsuario} value={usuario.idUsuario}>
+              {usuario.nombreCompleto} — {etiquetaRol(usuario.rol)}
+            </option>
+          ))}
+        </select>
+      </section>
+
+      <section style={{ border: '1px solid #ddd', padding: 12, marginBottom: 16 }}>
         <h2>Datos</h2>
         <p><b>Estado:</b> {orden.estado.replaceAll('_', ' ')}</p>
-        <p><b>Vehículo:</b> {orden.patenteVehiculo} (id {orden.idVehiculo})</p>
-        <p><b>Cliente:</b> {orden.nombreCliente} (id {orden.idCliente})</p>
-        <p><b>Mecánico:</b> {orden.nombreMecanico ?? 'sin asignar'}{orden.idMecanico ? ` (id ${orden.idMecanico})` : ''}</p>
+        <p><b>Vehículo:</b> {orden.patenteVehiculo}</p>
+        <p><b>Cliente:</b> {orden.nombreCliente}</p>
+        <p><b>Mecánico:</b> {orden.nombreMecanico ?? 'sin asignar'}</p>
         <p><b>Kilometraje ingreso:</b> {orden.kilometrajeIngreso ?? '—'}</p>
         <p><b>Motivo:</b> {orden.motivoIngreso ?? '—'}</p>
         <p><b>Diagnóstico:</b> {orden.diagnostico ?? '—'}</p>
@@ -143,7 +262,7 @@ export default function PaginaDetalleOrden() {
         <SelectorEstado
           estadoActual={orden.estado}
           onCambiar={cambiarEstado}
-          deshabilitado={entregada}
+          deshabilitado={entregada || !idUsuarioResponsable}
         />
       </section>
 
@@ -153,20 +272,25 @@ export default function PaginaDetalleOrden() {
           <textarea
             placeholder="Diagnóstico"
             value={diagnostico}
-            onChange={(e) => setDiagnostico(e.target.value)}
+            onChange={(event) => setDiagnostico(event.target.value)}
             disabled={entregada}
             rows={3}
             style={{ width: '100%', padding: 6, marginBottom: 8 }}
           />
+
           <input
             type="text"
             placeholder="Observaciones (opcional)"
             value={obsTecnica}
-            onChange={(e) => setObsTecnica(e.target.value)}
+            onChange={(event) => setObsTecnica(event.target.value)}
             disabled={entregada}
             style={{ width: '100%', padding: 6, marginBottom: 8 }}
           />
-          <button type="submit" disabled={entregada || !diagnostico.trim()}>
+
+          <button
+            type="submit"
+            disabled={entregada || !diagnostico.trim() || !idUsuarioResponsable}
+          >
             Guardar diagnóstico
           </button>
         </form>
@@ -175,15 +299,24 @@ export default function PaginaDetalleOrden() {
       <section style={{ border: '1px solid #ddd', padding: 12, marginBottom: 16 }}>
         <h2>Mecánico asignado</h2>
         <form onSubmit={asignarMecanico}>
-          <input
-            type="number"
-            placeholder="ID del mecánico"
+          <select
             value={idMecanico}
-            onChange={(e) => setIdMecanico(e.target.value)}
+            onChange={(event) => setIdMecanico(event.target.value)}
             disabled={entregada}
-            style={{ padding: 6, marginRight: 8, width: 160 }}
-          />
-          <button type="submit" disabled={entregada || !idMecanico}>
+            style={{ padding: 7, marginRight: 8, minWidth: 280 }}
+          >
+            <option value="">Seleccionar mecánico</option>
+            {mecanicos.map((mecanico) => (
+              <option key={mecanico.idUsuario} value={mecanico.idUsuario}>
+                {mecanico.nombreCompleto}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="submit"
+            disabled={entregada || !idMecanico || !idUsuarioResponsable}
+          >
             Asignar
           </button>
         </form>
@@ -191,31 +324,41 @@ export default function PaginaDetalleOrden() {
 
       <section style={{ border: '1px solid #ddd', padding: 12, marginBottom: 16 }}>
         <h2>Trabajos realizados</h2>
+
         {trabajos.length === 0 ? (
           <p>Sin trabajos cargados.</p>
         ) : (
           <ul>
-            {trabajos.map((t) => (
-              <li key={t.idDetalle}>
-                {t.descripcion}
-                {t.fechaRegistro && (
+            {trabajos.map((trabajo) => (
+              <li key={trabajo.idDetalle}>
+                {trabajo.descripcion}
+                {trabajo.fechaRegistro && (
                   <span style={{ color: '#888', marginLeft: 8, fontSize: 12 }}>
-                    ({t.fechaRegistro.replace('T', ' ').slice(0, 16)})
+                    ({trabajo.fechaRegistro.replace('T', ' ').slice(0, 16)})
                   </span>
                 )}
               </li>
             ))}
           </ul>
         )}
-        <FormTrabajo onAgregar={agregarTrabajo} deshabilitado={entregada} />
+
+        <FormTrabajo
+          onAgregar={agregarTrabajo}
+          deshabilitado={entregada || !idUsuarioResponsable}
+        />
       </section>
 
       <section style={{ border: '1px solid #ddd', padding: 12 }}>
         <h2>Historial de estados</h2>
+
         {historial.length === 0 ? (
           <p>Sin cambios registrados.</p>
         ) : (
-          <table border="1" cellPadding="8" style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <table
+            border="1"
+            cellPadding="8"
+            style={{ borderCollapse: 'collapse', width: '100%' }}
+          >
             <thead>
               <tr>
                 <th>Fecha</th>
@@ -225,14 +368,15 @@ export default function PaginaDetalleOrden() {
                 <th>Observación</th>
               </tr>
             </thead>
+
             <tbody>
-              {historial.map((h) => (
-                <tr key={h.idHistorial}>
-                  <td>{h.fechaCambio?.replace('T', ' ').slice(0, 16) ?? '—'}</td>
-                  <td>{h.estadoAnterior?.replaceAll('_', ' ') ?? '—'}</td>
-                  <td>{h.estadoNuevo.replaceAll('_', ' ')}</td>
-                  <td>{h.nombreUsuario} ({h.rolUsuario})</td>
-                  <td>{h.observacion ?? '—'}</td>
+              {historial.map((item) => (
+                <tr key={item.idHistorial}>
+                  <td>{item.fechaCambio?.replace('T', ' ').slice(0, 16) ?? '—'}</td>
+                  <td>{item.estadoAnterior?.replaceAll('_', ' ') ?? '—'}</td>
+                  <td>{item.estadoNuevo.replaceAll('_', ' ')}</td>
+                  <td>{item.nombreUsuario} ({item.rolUsuario})</td>
+                  <td>{item.observacion ?? '—'}</td>
                 </tr>
               ))}
             </tbody>

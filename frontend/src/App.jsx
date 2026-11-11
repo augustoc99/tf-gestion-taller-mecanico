@@ -5,6 +5,8 @@ import PaginaListaClientes from './paginas/clientes/PaginaListaClientes';
 import PaginaCrearOrden from './paginas/ordenes/PaginaCrearOrden';
 import PaginaDetalleOrden from './paginas/ordenes/PaginaDetalleOrden';
 import PaginaListaOrdenes from './paginas/ordenes/PaginaListaOrdenes';
+import PaginaFormularioUsuario from './paginas/usuarios/PaginaFormularioUsuario';
+import PaginaListaUsuarios from './paginas/usuarios/PaginaListaUsuarios';
 import PaginaFormularioVehiculo from './paginas/vehiculos/PaginaFormularioVehiculo';
 import PaginaListaVehiculos from './paginas/vehiculos/PaginaListaVehiculos';
 
@@ -27,6 +29,10 @@ export default function App() {
         <Route path="/vehiculos" element={<PaginaListaVehiculos />} />
         <Route path="/vehiculos/nuevo" element={<PaginaFormularioVehiculo />} />
         <Route path="/vehiculos/:id/editar" element={<PaginaFormularioVehiculo />} />
+
+        <Route path="/usuarios" element={<PaginaListaUsuarios />} />
+        <Route path="/usuarios/nuevo" element={<PaginaFormularioUsuario />} />
+        <Route path="/usuarios/:id/editar" element={<PaginaFormularioUsuario />} />
       </Routes>
     </BrowserRouter>
   );

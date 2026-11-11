@@ -24,6 +24,13 @@ export default function Navegacion() {
       >
         Vehículos
       </NavLink>
+
+      <NavLink
+        to="/usuarios"
+        className={({ isActive }) => (isActive ? 'activo' : undefined)}
+      >
+        Usuarios
+      </NavLink>
     </nav>
   );
 }
