@@ -2,13 +2,27 @@ package com.taller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> campos = new LinkedHashMap<>();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error -> campos.putIfAbsent(error.getField(), error.getDefaultMessage()));
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "error", "DATOS_INVALIDOS",
+                "campos", campos
+        ));
+    }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException ex) {
@@ -22,7 +36,10 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("error", "TRANSICION_INVALIDA", "detalle", mensaje));
         }
-        if (mensaje.contains("No se puede")) {
+        if (mensaje.contains("No se puede")
+                || mensaje.contains("debe")
+                || mensaje.contains("Sólo")
+                || mensaje.contains("estados técnicos")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "OPERACION_INVALIDA", "detalle", mensaje));
         }

@@ -21,4 +21,4 @@ dist/
 
 # Sistema operativo
 .DS_Store
-Thumbs.dbbackend/data/
+Thumbs.db

@@ -1,10 +1,15 @@
 package com.taller.service;
 
-import com.taller.entity.HistorialEstado;
-import com.taller.entity.OrdenTrabajo;
-import com.taller.repository.HistorialEstadoRepository;
+import com.taller.dto.ActualizarOrdenRequest;
+import com.taller.dto.CambioEstadoRequest;
+import com.taller.dto.CrearOrdenRequest;
+import com.taller.entity.*;
+import com.taller.repository.HistorialEstadoOrdenRepository;
 import com.taller.repository.OrdenTrabajoRepository;
+import com.taller.repository.UsuarioRepository;
+import com.taller.repository.VehiculoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,108 +18,180 @@ import java.util.Map;
 @Service
 public class OrdenTrabajoService {
 
-    private final OrdenTrabajoRepository repo;
-    private final HistorialEstadoRepository historialRepo;
-
-    // Máquina de estados: desde -> posibles destinos
-    private static final Map<String, List<String>> TRANSICIONES = Map.of(
-            "RECIBIDO",           List.of("EN_DIAGNOSTICO"),
-            "EN_DIAGNOSTICO",     List.of("EN_REPARACION", "ESPERANDO_REPUESTO"),
-            "EN_REPARACION",      List.of("ESPERANDO_REPUESTO", "CONTROL_FINAL"),
-            "ESPERANDO_REPUESTO", List.of("EN_REPARACION"),
-            "CONTROL_FINAL",      List.of("EN_REPARACION", "FINALIZADO"),
-            "FINALIZADO",         List.of("ENTREGADO"),
-            "ENTREGADO",          List.of()
+    private static final Map<EstadoOrden, List<EstadoOrden>> TRANSICIONES = Map.of(
+            EstadoOrden.RECIBIDO, List.of(EstadoOrden.EN_DIAGNOSTICO),
+            EstadoOrden.EN_DIAGNOSTICO, List.of(EstadoOrden.EN_REPARACION, EstadoOrden.ESPERANDO_REPUESTO),
+            EstadoOrden.EN_REPARACION, List.of(EstadoOrden.ESPERANDO_REPUESTO, EstadoOrden.CONTROL_FINAL),
+            EstadoOrden.ESPERANDO_REPUESTO, List.of(EstadoOrden.EN_REPARACION),
+            EstadoOrden.CONTROL_FINAL, List.of(EstadoOrden.EN_REPARACION, EstadoOrden.FINALIZADO),
+            EstadoOrden.FINALIZADO, List.of(EstadoOrden.ENTREGADO),
+            EstadoOrden.ENTREGADO, List.of()
     );
 
-    public OrdenTrabajoService(OrdenTrabajoRepository repo, HistorialEstadoRepository historialRepo) {
-        this.repo = repo;
+    private final OrdenTrabajoRepository ordenRepo;
+    private final HistorialEstadoOrdenRepository historialRepo;
+    private final VehiculoRepository vehiculoRepo;
+    private final UsuarioRepository usuarioRepo;
+
+    public OrdenTrabajoService(
+            OrdenTrabajoRepository ordenRepo,
+            HistorialEstadoOrdenRepository historialRepo,
+            VehiculoRepository vehiculoRepo,
+            UsuarioRepository usuarioRepo) {
+        this.ordenRepo = ordenRepo;
         this.historialRepo = historialRepo;
+        this.vehiculoRepo = vehiculoRepo;
+        this.usuarioRepo = usuarioRepo;
     }
 
     public List<OrdenTrabajo> listar() {
-        return repo.findAll();
+        return ordenRepo.findAll();
     }
 
-    public List<OrdenTrabajo> listarPorEstado(String estado) {
-        return repo.findByEstado(estado);
+    public List<OrdenTrabajo> listarPorEstado(EstadoOrden estado) {
+        return ordenRepo.findByEstadoOrderByFechaIngresoDesc(estado);
     }
 
-    public OrdenTrabajo obtener(Integer id) {
-        return repo.findById(id)
+    public OrdenTrabajo obtener(Long id) {
+        return ordenRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada: " + id));
     }
 
-    public OrdenTrabajo crear(OrdenTrabajo orden) {
-        orden.setFechaIngreso(LocalDateTime.now());
-        if (orden.getEstado() == null) {
-            orden.setEstado("RECIBIDO");
-        }
-        OrdenTrabajo guardada = repo.save(orden);
+    @Transactional
+    public OrdenTrabajo crear(CrearOrdenRequest req) {
+        Vehiculo vehiculo = vehiculoRepo.findById(req.idVehiculo())
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado: " + req.idVehiculo()));
 
-        // Registrar el estado inicial en el historial
-        registrarHistorial(guardada, null, "RECIBIDO", "Creación de la orden");
-        return guardada;
+        OrdenTrabajo orden = new OrdenTrabajo();
+        orden.setVehiculo(vehiculo);
+        orden.setKilometrajeIngreso(req.kilometrajeIngreso());
+        orden.setMotivoIngreso(req.motivoIngreso().trim());
+        orden.setObservaciones(limpiar(req.observaciones()));
+        orden.setFechaIngreso(LocalDateTime.now());
+        orden.setEstado(EstadoOrden.RECIBIDO);
+
+        if (req.idMecanico() != null) {
+            orden.setMecanico(obtenerMecanicoValido(req.idMecanico()));
+        }
+
+        // RECIBIDO es el estado inicial, no una transición: no genera historial.
+        return ordenRepo.save(orden);
     }
 
-    public OrdenTrabajo actualizar(Integer id, OrdenTrabajo datos) {
+    @Transactional
+    public OrdenTrabajo actualizar(Long id, ActualizarOrdenRequest req) {
         OrdenTrabajo orden = obtener(id);
-        if ("ENTREGADO".equals(orden.getEstado())) {
+        if (orden.getEstado() == EstadoOrden.ENTREGADO) {
             throw new RuntimeException("No se puede modificar una orden ENTREGADA");
         }
-        orden.setProblemaInformado(datos.getProblemaInformado());
-        orden.setKilometrajeIngreso(datos.getKilometrajeIngreso());
-        orden.setDiagnostico(datos.getDiagnostico());
-        orden.setObservaciones(datos.getObservaciones());
-        return repo.save(orden);
+
+        orden.setKilometrajeIngreso(req.kilometrajeIngreso());
+        orden.setMotivoIngreso(req.motivoIngreso().trim());
+        orden.setDiagnostico(limpiar(req.diagnostico()));
+        orden.setObservaciones(limpiar(req.observaciones()));
+        return ordenRepo.save(orden);
     }
 
-    public OrdenTrabajo cambiarEstado(Integer id, String estadoNuevo, String observacion) {
+    @Transactional
+    public OrdenTrabajo cambiarEstado(Long id, CambioEstadoRequest req) {
         OrdenTrabajo orden = obtener(id);
-        String estadoActual = orden.getEstado();
+        EstadoOrden actual = orden.getEstado();
+        EstadoOrden nuevo = req.estadoNuevo();
 
-        List<String> permitidos = TRANSICIONES.getOrDefault(estadoActual, List.of());
-        if (!permitidos.contains(estadoNuevo)) {
-            throw new RuntimeException(
-                    "Transición inválida: " + estadoActual + " -> " + estadoNuevo
-            );
+        List<EstadoOrden> destinos = TRANSICIONES.getOrDefault(actual, List.of());
+        if (!destinos.contains(nuevo)) {
+            throw new RuntimeException("Transición inválida: " + actual + " -> " + nuevo);
         }
 
-        orden.setEstado(estadoNuevo);
-        if ("ENTREGADO".equals(estadoNuevo)) {
-            orden.setFechaEgreso(LocalDateTime.now());
-        }
-        OrdenTrabajo guardada = repo.save(orden);
+        Usuario responsable = obtenerUsuarioActivo(req.idUsuarioResponsable());
+        validarResponsableTransicion(orden, nuevo, responsable);
 
-        registrarHistorial(guardada, estadoActual, estadoNuevo, observacion);
+        orden.setEstado(nuevo);
+        if (nuevo == EstadoOrden.ENTREGADO) {
+            orden.setFechaEntrega(LocalDateTime.now());
+        }
+        OrdenTrabajo guardada = ordenRepo.save(orden);
+
+        registrarHistorial(guardada, actual, nuevo, responsable, req.observacion());
         return guardada;
     }
 
-    public OrdenTrabajo asignarMecanico(Integer id, Integer idMecanico) {
-        OrdenTrabajo orden = obtener(id);
-        if ("ENTREGADO".equals(orden.getEstado())) {
+    @Transactional
+    public OrdenTrabajo asignarMecanico(Long idOrden, Long idMecanico) {
+        OrdenTrabajo orden = obtener(idOrden);
+        if (orden.getEstado() == EstadoOrden.ENTREGADO) {
             throw new RuntimeException("No se puede reasignar una orden ENTREGADA");
         }
-        orden.setIdMecanico(idMecanico);
-        return repo.save(orden);
+
+        orden.setMecanico(obtenerMecanicoValido(idMecanico));
+        return ordenRepo.save(orden);
     }
 
-    public List<HistorialEstado> obtenerHistorial(Integer idOrden) {
+    public List<HistorialEstadoOrden> obtenerHistorial(Long idOrden) {
         obtener(idOrden);
-        return historialRepo.findByOrdenIdOrdenOrderByFechaCambioAsc(idOrden);
+        return historialRepo.findByOrden_IdOrdenOrderByFechaCambioAsc(idOrden);
     }
 
-    public void eliminar(Integer id) {
-        repo.deleteById(id);
+    private Usuario obtenerUsuarioActivo(Long idUsuario) {
+        Usuario usuario = usuarioRepo.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + idUsuario));
+        if (!Boolean.TRUE.equals(usuario.getActivo())) {
+            throw new RuntimeException("No se puede operar con un usuario inactivo");
+        }
+        return usuario;
     }
 
-    private void registrarHistorial(OrdenTrabajo orden, String anterior, String nuevo, String observacion) {
-        HistorialEstado h = new HistorialEstado();
-        h.setOrden(orden);
-        h.setEstadoAnterior(anterior);
-        h.setEstadoNuevo(nuevo);
-        h.setFechaCambio(LocalDateTime.now());
-        h.setObservacion(observacion);
-        historialRepo.save(h);
+    private Usuario obtenerMecanicoValido(Long idMecanico) {
+        Usuario mecanico = obtenerUsuarioActivo(idMecanico);
+        if (mecanico.getRol() != RolUsuario.MECANICO) {
+            throw new RuntimeException("El usuario asignado debe tener rol MECANICO");
+        }
+        return mecanico;
+    }
+
+    private void validarResponsableTransicion(OrdenTrabajo orden, EstadoOrden nuevo, Usuario responsable) {
+        if (nuevo == EstadoOrden.ENTREGADO) {
+            if (responsable.getRol() != RolUsuario.RECEPCION_ADMINISTRACION) {
+                throw new RuntimeException("La entrega debe registrarla Recepción/Administración");
+            }
+            return;
+        }
+
+        if (responsable.getRol() != RolUsuario.MECANICO) {
+            throw new RuntimeException("Los estados técnicos debe gestionarlos un usuario MECANICO");
+        }
+
+        if (orden.getMecanico() == null) {
+            throw new RuntimeException("Debe asignarse un mecánico antes de iniciar el diagnóstico");
+        }
+
+        if (!orden.getMecanico().getIdUsuario().equals(responsable.getIdUsuario())) {
+            throw new RuntimeException("Sólo el mecánico asignado puede gestionar los estados técnicos de la orden");
+        }
+    }
+
+    private void registrarHistorial(
+            OrdenTrabajo orden,
+            EstadoOrden anterior,
+            EstadoOrden nuevo,
+            Usuario responsable,
+            String observacion) {
+
+        HistorialEstadoOrden historial = new HistorialEstadoOrden();
+        historial.setOrden(orden);
+        historial.setEstadoAnterior(anterior);
+        historial.setEstadoNuevo(nuevo);
+        historial.setFechaCambio(LocalDateTime.now());
+        historial.setUsuario(responsable);
+        historial.setObservacion(limpiar(observacion));
+        historialRepo.save(historial);
+    }
+
+    private String limpiar(String valor) {
+        if (valor == null) {
+            return null;
+        }
+        String limpio = valor.trim();
+        return limpio.isEmpty() ? null : limpio;
     }
 }

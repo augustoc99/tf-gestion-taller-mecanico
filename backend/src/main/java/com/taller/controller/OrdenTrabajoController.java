@@ -1,9 +1,13 @@
 package com.taller.controller;
 
-import com.taller.entity.HistorialEstado;
+import com.taller.dto.*;
+import com.taller.entity.DetalleTrabajo;
+import com.taller.entity.EstadoOrden;
+import com.taller.entity.HistorialEstadoOrden;
 import com.taller.entity.OrdenTrabajo;
+import com.taller.service.DetalleTrabajoService;
 import com.taller.service.OrdenTrabajoService;
-import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,70 +16,58 @@ import java.util.List;
 @RequestMapping("/api/ordenes")
 public class OrdenTrabajoController {
 
-    private final OrdenTrabajoService service;
-    private final com.taller.service.TrabajoRealizadoService trabajoService;
+    private final OrdenTrabajoService ordenService;
+    private final DetalleTrabajoService detalleService;
 
-    public OrdenTrabajoController(OrdenTrabajoService service, com.taller.service.TrabajoRealizadoService trabajoService) {
-        this.service = service;
-        this.trabajoService = trabajoService;
+    public OrdenTrabajoController(OrdenTrabajoService ordenService, DetalleTrabajoService detalleService) {
+        this.ordenService = ordenService;
+        this.detalleService = detalleService;
     }
 
-    public record CambioEstadoRequest(String estadoNuevo, String observacion) {}
-    public record AsignarMecanicoRequest(Integer idMecanico) {}
-
     @GetMapping
-    public List<OrdenTrabajo> listar(@RequestParam(required = false) String estado) {
-        if (estado != null && !estado.isEmpty()) {
-            return service.listarPorEstado(estado);
-        }
-        return service.listar();
+    public List<OrdenTrabajo> listar(@RequestParam(required = false) EstadoOrden estado) {
+        return estado == null ? ordenService.listar() : ordenService.listarPorEstado(estado);
     }
 
     @GetMapping("/{id}")
-    public OrdenTrabajo obtener(@PathVariable Integer id) {
-        return service.obtener(id);
+    public OrdenTrabajo obtener(@PathVariable Long id) {
+        return ordenService.obtener(id);
     }
 
     @PostMapping
-    public OrdenTrabajo crear(@RequestBody OrdenTrabajo orden) {
-        return service.crear(orden);
+    public OrdenTrabajo crear(@Valid @RequestBody CrearOrdenRequest req) {
+        return ordenService.crear(req);
     }
 
     @PutMapping("/{id}")
-    public OrdenTrabajo actualizar(@PathVariable Integer id, @RequestBody OrdenTrabajo orden) {
-        return service.actualizar(id, orden);
+    public OrdenTrabajo actualizar(@PathVariable Long id, @Valid @RequestBody ActualizarOrdenRequest req) {
+        return ordenService.actualizar(id, req);
     }
 
     @PutMapping("/{id}/estado")
-    public OrdenTrabajo cambiarEstado(@PathVariable Integer id, @RequestBody CambioEstadoRequest req) {
-        return service.cambiarEstado(id, req.estadoNuevo(), req.observacion());
+    public OrdenTrabajo cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambioEstadoRequest req) {
+        return ordenService.cambiarEstado(id, req);
     }
 
     @PutMapping("/{id}/mecanico")
-    public OrdenTrabajo asignarMecanico(@PathVariable Integer id, @RequestBody AsignarMecanicoRequest req) {
-        return service.asignarMecanico(id, req.idMecanico());
+    public OrdenTrabajo asignarMecanico(@PathVariable Long id, @Valid @RequestBody AsignarMecanicoRequest req) {
+        return ordenService.asignarMecanico(id, req.idMecanico());
     }
 
     @GetMapping("/{id}/historial")
-    public List<HistorialEstado> historial(@PathVariable Integer id) {
-        return service.obtenerHistorial(id);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        service.eliminar(id);
-        return ResponseEntity.noContent().build();
+    public List<HistorialEstadoOrden> historial(@PathVariable Long id) {
+        return ordenService.obtenerHistorial(id);
     }
 
     @PostMapping("/{id}/trabajos")
-    public com.taller.entity.TrabajoRealizado agregarTrabajo(
-            @PathVariable Integer id,
-            @RequestBody com.taller.entity.TrabajoRealizado trabajo) {
-        return trabajoService.agregar(id, trabajo);
+    public DetalleTrabajo agregarTrabajo(
+            @PathVariable Long id,
+            @Valid @RequestBody AgregarDetalleTrabajoRequest req) {
+        return detalleService.agregar(id, req);
     }
 
     @GetMapping("/{id}/trabajos")
-    public java.util.List<com.taller.entity.TrabajoRealizado> listarTrabajos(@PathVariable Integer id) {
-        return trabajoService.listarPorOrden(id);
+    public List<DetalleTrabajo> listarTrabajos(@PathVariable Long id) {
+        return detalleService.listarPorOrden(id);
     }
 }
