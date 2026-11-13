@@ -9,6 +9,7 @@ import PaginaFormularioUsuario from './paginas/usuarios/PaginaFormularioUsuario'
 import PaginaListaUsuarios from './paginas/usuarios/PaginaListaUsuarios';
 import PaginaFormularioVehiculo from './paginas/vehiculos/PaginaFormularioVehiculo';
 import PaginaListaVehiculos from './paginas/vehiculos/PaginaListaVehiculos';
+import PaginaHistorialVehiculo from './paginas/vehiculos/PaginaHistorialVehiculo';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/vehiculos" element={<PaginaListaVehiculos />} />
         <Route path="/vehiculos/nuevo" element={<PaginaFormularioVehiculo />} />
         <Route path="/vehiculos/:id/editar" element={<PaginaFormularioVehiculo />} />
+        <Route path="/vehiculos/:id/historial" element={<PaginaHistorialVehiculo />} />
 
         <Route path="/usuarios" element={<PaginaListaUsuarios />} />
         <Route path="/usuarios/nuevo" element={<PaginaFormularioUsuario />} />

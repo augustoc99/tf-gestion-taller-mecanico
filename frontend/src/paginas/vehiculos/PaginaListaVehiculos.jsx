@@ -157,6 +157,10 @@ export default function PaginaListaVehiculos() {
                     <Link to={`/vehiculos/${vehiculo.idVehiculo}/editar`}>
                       Editar
                     </Link>
+                    {' | '}
+                    <Link to={`/vehiculos/${vehiculo.idVehiculo}/historial`}>
+                      Historial
+                    </Link>
                   </td>
                 </tr>
               ))}
