@@ -215,6 +215,10 @@ export default function PaginaDetalleOrden() {
 
   const entregada = orden.estado === 'ENTREGADO';
 
+  const puedeRegistrarTrabajo =
+    ['EN_REPARACION', 'CONTROL_FINAL'].includes(orden.estado)
+    && Number(idUsuarioResponsable) === Number(orden.idMecanico);
+
   return (
     <div style={{ padding: 20, maxWidth: 900, margin: '0 auto' }}>
       <Link to="/ordenes">← Volver a la lista</Link>
@@ -342,9 +346,16 @@ export default function PaginaDetalleOrden() {
           </ul>
         )}
 
+        {!puedeRegistrarTrabajo && !entregada && (
+          <p style={{ color: '#666', fontSize: 13 }}>
+            Los trabajos pueden registrarse en EN REPARACION o CONTROL FINAL
+            por el mecánico asignado.
+          </p>
+        )}
+
         <FormTrabajo
           onAgregar={agregarTrabajo}
-          deshabilitado={entregada || !idUsuarioResponsable}
+          deshabilitado={!puedeRegistrarTrabajo}
         />
       </section>
 
