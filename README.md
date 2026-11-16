@@ -1,285 +1,530 @@
 # MiTaller
 
-**Sistema Web de Gestión y Trazabilidad para Taller Mecánico**
+## Sistema Web de GestiÃ³n y Trazabilidad para Taller MecÃ¡nico
 
-Proyecto desarrollado como Trabajo Final de la **Tecnicatura Universitaria en Programación a Distancia de la Universidad Tecnológica Nacional**.
+**Trabajo Final Integrador â€” Tecnicatura Universitaria en ProgramaciÃ³n a Distancia**
+**Universidad TecnolÃ³gica Nacional**
 
-## Sobre el proyecto
+**Integrantes:** Augusto MatÃ­as CÃºneo Brouwer de Koning y NicolÃ¡s Azcuy
+**Tutora:** Prof. MarÃ­a Candela Grosso
 
-MiTaller es una aplicación web pensada para talleres mecánicos pequeños y medianos que necesitan centralizar la información de sus clientes, vehículos y reparaciones.
+Repositorio oficial:
+https://github.com/augustoc99/tf-gestion-taller-mecanico
 
-El proyecto parte de un problema concreto: la información de una intervención puede quedar distribuida entre anotaciones, planillas, mensajes y distintos registros, lo que dificulta conocer el estado actual de una reparación y recuperar posteriormente lo ocurrido.
+AplicaciÃ³n desplegada:
+https://tf-gestion-taller-mecanico-frontend.vercel.app
 
-Por eso, el eje de MiTaller es la **orden de trabajo**. Cada intervención quedará asociada a un vehículo y permitirá registrar los datos de ingreso, el mecánico responsable, el diagnóstico, los trabajos realizados, las observaciones técnicas y el estado de la reparación.
+---
 
-Además del estado actual, el sistema conservará los cambios producidos durante la intervención para poder reconstruir su evolución.
+## 1. DescripciÃ³n del proyecto
 
-## Producto Mínimo Viable
+MiTaller es una aplicaciÃ³n web desarrollada para centralizar la gestiÃ³n operativa de un taller mecÃ¡nico y mantener la trazabilidad de las intervenciones realizadas sobre cada vehÃ­culo.
 
-El MVP comprende las funcionalidades necesarias para gestionar una intervención desde el ingreso del vehículo hasta su entrega.
+El proyecto parte de una problemÃ¡tica habitual en talleres pequeÃ±os y medianos: la informaciÃ³n vinculada con clientes, vehÃ­culos, diagnÃ³sticos, reparaciones y estados de trabajo suele encontrarse distribuida entre distintos medios, como planillas, anotaciones, mensajes o registros independientes. Esta dispersiÃ³n dificulta conocer con precisiÃ³n quÃ© ocurriÃ³ durante una reparaciÃ³n y recuperar posteriormente el historial tÃ©cnico de un vehÃ­culo.
 
-Incluye:
+La propuesta consiste en integrar esa informaciÃ³n dentro de un Ãºnico sistema, estructurando el proceso desde el ingreso del vehÃ­culo hasta su entrega al cliente.
 
-- usuarios y roles;
-- clientes;
-- vehículos;
-- órdenes de trabajo;
-- asignación de mecánico responsable;
-- diagnóstico;
-- trabajos realizados;
-- observaciones técnicas;
-- estados de reparación;
-- historial de cambios de estado;
-- consulta de intervenciones anteriores de cada vehículo.
+El eje funcional de MiTaller es la orden de trabajo. A travÃ©s de ella se registran el motivo de ingreso, el kilometraje, el mecÃ¡nico asignado, el diagnÃ³stico, los trabajos efectuados, las observaciones y cada cambio de estado producido durante la intervenciÃ³n.
 
-La **gestión de turnos** y el **dashboard operativo** quedan como funcionalidades complementarias y no condicionan el funcionamiento del MVP.
+---
 
-Se implementarán únicamente si el circuito principal se encuentra completo, probado y estable.
+## 2. Objetivo
 
-## Roles
+El objetivo principal es disponer de una aplicaciÃ³n que permita registrar y consultar de manera organizada la informaciÃ³n necesaria para gestionar una reparaciÃ³n y reconstruir posteriormente todo su recorrido.
 
-MiTaller contempla inicialmente dos roles funcionales.
+La trazabilidad no se limita a mostrar el estado actual de una orden. El sistema conserva tambiÃ©n los cambios producidos durante el proceso, el usuario responsable de cada acciÃ³n y el historial de intervenciones anteriores del vehÃ­culo.
 
-### Recepción / Administración
+De esta forma, MiTaller permite responder de manera directa preguntas como cuÃ¡ndo ingresÃ³ un vehÃ­culo, por quÃ© motivo, quÃ© diagnÃ³stico recibiÃ³, quÃ© trabajos se realizaron, quiÃ©n intervino y cuÃ¡l fue la evoluciÃ³n de la orden hasta su finalizaciÃ³n y entrega.
 
-Será responsable de:
+---
 
-- registrar, consultar y modificar clientes;
-- registrar, consultar y modificar vehículos;
-- crear órdenes de trabajo;
-- cargar los datos iniciales de ingreso;
-- asignar el mecánico responsable;
-- consultar las órdenes y su estado;
-- consultar el historial de intervenciones de los vehículos;
-- registrar la entrega del vehículo.
+## 3. Alcance de la versiÃ³n final
 
-### Mecánico
+La versiÃ³n final se concentra en el Producto MÃ­nimo Viable definido para el proyecto. Se priorizÃ³ la correcta implementaciÃ³n del circuito principal antes que la incorporaciÃ³n de funcionalidades complementarias.
 
-Trabajará sobre las órdenes que tenga asignadas y podrá:
+El sistema permite administrar usuarios, clientes y vehÃ­culos, generar Ã³rdenes de trabajo, asignar mecÃ¡nicos, registrar informaciÃ³n tÃ©cnica, gestionar el avance de una reparaciÃ³n y consultar la trazabilidad completa de cada intervenciÃ³n.
 
-- consultar sus órdenes;
-- registrar el diagnóstico;
-- cargar los trabajos realizados;
-- incorporar observaciones técnicas;
-- actualizar los estados correspondientes al proceso de reparación.
+TambiÃ©n se incorporÃ³ la consulta del historial de intervenciones por vehÃ­culo, de modo que las Ã³rdenes anteriores puedan recuperarse desde la propia ficha de la unidad.
 
-No se contempla un acceso para clientes dentro del MVP.
+La gestiÃ³n de turnos y el dashboard fueron considerados funcionalidades complementarias y no forman parte del alcance final implementado.
 
-## Flujo de una orden de trabajo
+---
 
-Toda orden comienza en estado **RECIBIDO**.
+## 4. Arquitectura
 
-El flujo normal previsto es:
+MiTaller utiliza una arquitectura cliente-servidor basada en una API REST.
 
-RECIBIDO  
-↓  
-EN DIAGNÓSTICO  
-↓  
-EN REPARACIÓN  
-↓  
-CONTROL FINAL  
-↓  
-FINALIZADO  
-↓  
+El frontend fue desarrollado con React y Vite. Su funciÃ³n es presentar la interfaz de usuario y consumir los servicios del backend mediante solicitudes HTTP.
+
+El backend fue desarrollado con Spring Boot y concentra la lÃ³gica de negocio, las validaciones, la gestiÃ³n de estados y el acceso a datos. La persistencia se implementa mediante Spring Data JPA e Hibernate sobre una base H2.
+
+La comunicaciÃ³n entre ambos componentes se realiza mediante JSON.
+
+```text
+Frontend
+React + Vite
+      |
+      | HTTP / JSON
+      v
+API REST
+Spring Boot
+      |
+      v
+Servicios y lÃ³gica de negocio
+      |
+      v
+JPA / Hibernate
+      |
+      v
+Base de datos H2
+```
+
+La separaciÃ³n entre frontend y backend permite mantener desacopladas la interfaz, la lÃ³gica de negocio y la persistencia.
+
+---
+
+## 5. Modelo funcional
+
+### Usuarios y roles
+
+El sistema contempla dos roles operativos:
+
+`RECEPCION_ADMINISTRACION`
+
+`MECANICO`
+
+RecepciÃ³n/AdministraciÃ³n concentra las tareas vinculadas con el ingreso y seguimiento administrativo del vehÃ­culo. Puede gestionar clientes y vehÃ­culos, generar Ã³rdenes, asignar mecÃ¡nicos, consultar informaciÃ³n y registrar la entrega final.
+
+El rol MecÃ¡nico interviene sobre las Ã³rdenes que le fueron asignadas. Puede registrar diagnÃ³sticos, trabajos realizados y avanzar una reparaciÃ³n dentro de los estados tÃ©cnicos permitidos.
+
+La versiÃ³n actual no incorpora autenticaciÃ³n mediante usuario y contraseÃ±a. Para poder demostrar y probar las reglas de autorizaciÃ³n del MVP, el frontend permite seleccionar un â€œUsuario actualâ€. Las validaciones relevantes se realizan igualmente en el backend.
+
+---
+
+### Clientes y vehÃ­culos
+
+Los clientes pueden ser registrados, consultados, buscados y modificados.
+
+Cada vehÃ­culo se encuentra asociado a un cliente. El sistema permite registrar sus datos, modificarlos y consultar las Ã³rdenes de trabajo relacionadas.
+
+Desde el mÃ³dulo de vehÃ­culos tambiÃ©n se encuentra disponible el historial de intervenciones, que permite visualizar las distintas Ã³rdenes registradas para una misma unidad y acceder nuevamente al detalle de cada una.
+
+---
+
+### Ã“rdenes de trabajo
+
+La orden de trabajo constituye el nÃºcleo del sistema.
+
+En cada intervenciÃ³n se registran el vehÃ­culo, el cliente, el kilometraje de ingreso, el motivo informado, el mecÃ¡nico asignado, el diagnÃ³stico, las observaciones tÃ©cnicas y los trabajos realizados.
+
+Cada orden posee ademÃ¡s un estado que representa la etapa actual del proceso.
+
+---
+
+## 6. Flujo de estados
+
+El circuito implementado utiliza los siguientes estados:
+
+```text
+RECIBIDO
+EN_DIAGNOSTICO
+EN_REPARACION
+ESPERANDO_REPUESTO
+CONTROL_FINAL
+FINALIZADO
 ENTREGADO
+```
 
-También existe el estado temporal **ESPERANDO REPUESTO**.
+El avance no puede realizarse libremente entre cualquier estado. Las transiciones se encuentran definidas y controladas por la lÃ³gica de negocio del backend.
 
-Una orden podrá pasar a **ESPERANDO REPUESTO** desde **EN DIAGNÓSTICO** o desde **EN REPARACIÓN** cuando la intervención no pueda continuar por falta de un componente.
+El flujo general es el siguiente:
 
-Una vez disponible el repuesto, la orden continuará en **EN REPARACIÓN**.
+```text
+RECIBIDO
+   |
+   v
+EN_DIAGNOSTICO
+   | \
+   |  \
+   v   v
+EN_REPARACION <----> ESPERANDO_REPUESTO
+   |
+   v
+CONTROL_FINAL
+   | \
+   |  \
+   |   v
+   | EN_REPARACION
+   v
+FINALIZADO
+   |
+   v
+ENTREGADO
+```
 
-Si durante **CONTROL FINAL** se detectan nuevas tareas o correcciones, la orden podrá volver a **EN REPARACIÓN**.
+En total se encuentran implementadas nueve transiciones vÃ¡lidas.
 
-Las transiciones previstas para el MVP son:
+Una orden puede crearse inicialmente sin mecÃ¡nico asignado, pero debe contar con uno antes de comenzar el diagnÃ³stico.
 
-| Estado de origen | Estado de destino | Responsable |
-|---|---|---|
-| RECIBIDO | EN DIAGNÓSTICO | Mecánico |
-| EN DIAGNÓSTICO | EN REPARACIÓN | Mecánico |
-| EN DIAGNÓSTICO | ESPERANDO REPUESTO | Mecánico |
-| EN REPARACIÓN | ESPERANDO REPUESTO | Mecánico |
-| ESPERANDO REPUESTO | EN REPARACIÓN | Mecánico |
-| EN REPARACIÓN | CONTROL FINAL | Mecánico |
-| CONTROL FINAL | EN REPARACIÓN | Mecánico |
-| CONTROL FINAL | FINALIZADO | Mecánico |
-| FINALIZADO | ENTREGADO | Recepción / Administración |
+`ENTREGADO` representa el estado terminal del circuito.
 
-Las transiciones estarán controladas por la lógica de negocio y no podrán realizarse de forma arbitraria.
+---
 
-Cada cambio de estado conservará:
+## 7. Trazabilidad
 
-- estado anterior;
-- nuevo estado;
-- fecha y hora;
-- usuario responsable.
+Cada cambio de estado genera automÃ¡ticamente un registro histÃ³rico.
 
-El estado **ENTREGADO** será terminal dentro del circuito previsto para el MVP.
+El sistema conserva el estado anterior, el nuevo estado, la fecha y hora del cambio, el usuario responsable y una observaciÃ³n cuando corresponde.
 
-## Modelo conceptual
+Esto permite reconstruir posteriormente el recorrido completo de una orden, en lugar de conservar Ãºnicamente su situaciÃ³n actual.
 
-Para el MVP se definieron seis entidades principales:
+La trazabilidad se complementa con el historial de intervenciones por vehÃ­culo, que permite recuperar las reparaciones realizadas en distintos ingresos al taller.
 
-- Cliente
-- Vehículo
-- Usuario
-- Orden de Trabajo
-- Detalle de Trabajo
-- Historial de Estado de la Orden
+---
 
-La **Orden de Trabajo** es la entidad central del sistema.
+## 8. Reglas de negocio relevantes
 
-Un cliente puede tener varios vehículos y un vehículo puede registrar distintas órdenes de trabajo a lo largo del tiempo.
+Las principales reglas se encuentran implementadas en la capa de servicios del backend.
 
-Una orden podrá crearse inicialmente sin mecánico asignado mientras permanezca en estado **RECIBIDO**, pero deberá tener un mecánico responsable antes de pasar a **EN DIAGNÓSTICO**.
+El sistema verifica que las transiciones de estado sean vÃ¡lidas, que los usuarios responsables se encuentren activos y que posean el rol necesario para realizar cada operaciÃ³n.
 
-El diagnóstico y el estado actual forman parte de la Orden de Trabajo.
+Los trabajos realizados solamente pueden ser registrados cuando la orden se encuentra en `EN_REPARACION` o `CONTROL_FINAL`. AdemÃ¡s, el usuario debe poseer rol `MECANICO` y coincidir con el mecÃ¡nico asignado a la orden.
 
-Los trabajos realizados se registrarán mediante Detalles de Trabajo y los cambios de estado mediante el Historial de Estado de la Orden.
+La transiciÃ³n entre `FINALIZADO` y `ENTREGADO` corresponde a RecepciÃ³n/AdministraciÃ³n.
 
-El historial general de un vehículo no requiere una entidad propia, ya que se obtendrá consultando cronológicamente sus órdenes de trabajo.
+Estas restricciones no dependen Ãºnicamente de la interfaz. El backend vuelve a validarlas antes de modificar la informaciÃ³n persistida.
 
-La entidad Turno podrá incorporarse posteriormente si se desarrolla esa funcionalidad complementaria.
+---
 
-## Dashboard
+## 9. TecnologÃ­as utilizadas
 
-El dashboard será una funcionalidad complementaria destinada principalmente a **Recepción / Administración**.
-
-En caso de implementarse, podrá mostrar:
-
-- cantidad de órdenes activas;
-- distribución de órdenes por estado;
-- vehículos actualmente en reparación;
-- órdenes en **ESPERANDO REPUESTO**;
-- órdenes **FINALIZADAS** pendientes de entrega.
-
-Su objetivo será ofrecer una visión rápida de la situación operativa del taller.
-
-El dashboard no forma parte de los requisitos indispensables del MVP.
-
-## Tecnologías
-
-| Componente | Tecnología |
+| Componente | TecnologÃ­a |
 |---|---|
-| Backend | Java 17 |
-| Framework backend | Spring Boot |
-| Persistencia | Spring Data JPA / Hibernate |
-| Gestión del proyecto Java | Maven |
+| Backend | Java, Spring Boot |
+| API | Spring Web / REST |
+| Persistencia | Spring Data JPA, Hibernate |
 | Base de datos | H2 |
-| Frontend | HTML, CSS y TypeScript |
-| Herramienta frontend | Vite |
-| Comunicación | API REST mediante HTTP y JSON |
-| Consumo de API | Fetch API |
-| Pruebas de API | Postman |
+| Frontend | React, Vite |
+| NavegaciÃ³n | React Router |
+| ComunicaciÃ³n HTTP | Axios |
+| GestiÃ³n de dependencias frontend | pnpm |
+| Build backend | Maven Wrapper |
+| Pruebas | JUnit |
 | Control de versiones | Git y GitHub |
-| Despliegue previsto | Vercel para el frontend |
+| Pruebas de API | Postman |
+| Despliegue backend | Railway |
+| Despliegue frontend | Vercel |
 
-Durante el desarrollo local se utilizará H2 en modo archivo para conservar la información entre ejecuciones.
+---
 
-## Arquitectura
+## 10. Estructura del repositorio
 
-MiTaller utilizará una arquitectura cliente-servidor.
+Todo el proyecto se mantiene dentro de un Ãºnico repositorio.
 
-El frontend estará desarrollado con **HTML, CSS, TypeScript y Vite** y se comunicará mediante HTTP y JSON con una **API REST** desarrollada con **Java 17 y Spring Boot**.
+```text
+tf-gestion-taller-mecanico/
+â”‚
+â”œâ”€â”€ backend/
+â”‚   â””â”€â”€ API REST, dominio, lÃ³gica de negocio y persistencia
+â”‚
+â”œâ”€â”€ frontend/
+â”‚   â””â”€â”€ AplicaciÃ³n web React
+â”‚
+â”œâ”€â”€ database/
+â”‚   â””â”€â”€ DocumentaciÃ³n vinculada con el modelo de datos
+â”‚
+â”œâ”€â”€ docs/
+â”‚   â””â”€â”€ Informes y documentaciÃ³n del Trabajo Final
+â”‚
+â”œâ”€â”€ .gitignore
+â””â”€â”€ README.md
+```
 
-El backend se organizará mediante las capas:
+La rama `main` contiene la versiÃ³n integrada utilizada como versiÃ³n final del proyecto.
 
-**Controller → Service → Repository → H2**
+---
 
-La capa **Controller** recibirá las solicitudes y expondrá los endpoints de la API.
+## 11. EjecuciÃ³n local
 
-La capa **Service** concentrará la lógica de negocio, incluyendo las reglas correspondientes a los roles y las transiciones permitidas entre estados.
+### Requisitos
 
-La capa **Repository** gestionará el acceso a los datos mediante Spring Data JPA.
+Para ejecutar la aplicaciÃ³n localmente es necesario contar con Java, Node.js, pnpm y Git.
 
-## Estructura del repositorio
+### Backend
 
-Todo el proyecto se desarrolla dentro de un único repositorio de GitHub.
+Desde la raÃ­z del repositorio:
 
-La estructura principal es:
+```powershell
+cd backend
+.\mvnw spring-boot:run
+```
 
-- **backend/** — API REST y lógica de negocio.
-- **frontend/** — interfaz web.
-- **database/** — documentación y archivos relacionados con el modelo de datos.
-- **docs/** — documentación correspondiente a las distintas entregas.
-  - **entrega-1/**
-  - **entrega-2/**
-  - **entrega-final/**
-- **.gitignore**
-- **README.md**
+La API queda disponible por defecto en:
 
-La estructura podrá ampliarse a medida que avance la implementación.
+```text
+http://localhost:8080/api
+```
 
-## Organización del trabajo
+Para ejecutar las pruebas automatizadas:
 
-El proyecto utiliza **Git y GitHub** para el control de versiones y la centralización del código y la documentación.
+```powershell
+cd backend
+.\mvnw test
+```
 
-Las tareas se registran mediante Issues y se organizan con GitHub Projects utilizando el flujo:
+---
 
-**Backlog → To Do → In Progress → Review → Done**
+### Frontend
 
-El desarrollo será compartido entre ambos integrantes para que los dos conozcan la arquitectura, el modelo de datos, las reglas de negocio y las decisiones técnicas adoptadas.
+Desde la raÃ­z del repositorio:
 
-## Plan de trabajo
+```powershell
+cd frontend
+pnpm install
+pnpm dev
+```
 
-| Etapa | Período |
-|---|---|
-| Revisión de propuesta y definición del MVP | 31/08 al 07/09 |
-| Modelo conceptual y arquitectura | 08/09 al 14/09 |
-| Modelo relacional y definición de módulos | 15/09 al 27/09 |
-| Inicialización técnica | 28/09 al 04/10 |
-| Usuarios, clientes y vehículos | 05/10 al 11/10 |
-| Órdenes de trabajo y trazabilidad | 12/10 al 25/10 |
-| Frontend e integración | 26/10 al 03/11 |
-| Pruebas y correcciones | 04/11 al 08/11 |
-| Despliegue | 09/11 al 10/11 |
-| Documentación y cierre | 11/11 al 14/11 |
+El servidor de desarrollo queda disponible normalmente en:
 
-Turnos y dashboard quedan fuera de la ruta crítica del MVP.
+```text
+http://localhost:5173
+```
 
-## Despliegue
+Si no se configura una variable `VITE_API_URL`, el frontend utiliza como API:
 
-Como parte de los requisitos del Trabajo Final, al menos uno de los componentes principales deberá encontrarse disponible online.
+```text
+http://localhost:8080/api
+```
 
-Se prevé desplegar el **frontend mediante Vercel**.
+Para generar y validar el build de producciÃ³n:
 
-Durante las primeras etapas, el backend y la base de datos funcionarán localmente.
+```powershell
+pnpm build
+```
 
-Posteriormente podrá evaluarse también el despliegue del backend si resulta viable sin agregar complejidad innecesaria al proyecto.
+---
 
-## Documentación
+## 12. Despliegue
 
-La documentación se encuentra organizada por instancias dentro de `docs/`.
+La versiÃ³n final se encuentra disponible online mediante dos servicios independientes.
 
-- **Primera entrega:** `docs/entrega-1/Trabajo_Final_Primera_Entrega.pdf`
-- **Segunda entrega:** `docs/entrega-2/arquitectura-y-modulos.md`
-- **Esquema SQL:** `database/schema.sql`
+### Frontend
 
-## Estado actual
+El frontend se encuentra publicado en Vercel:
 
-El proyecto se encuentra en la etapa de **Arquitectura y Módulos**, correspondiente a la segunda entrega.
+```text
+https://tf-gestion-taller-mecanico-frontend.vercel.app
+```
 
-A esta instancia se encuentran definidos:
+La aplicaciÃ³n utiliza la variable de entorno `VITE_API_URL` para indicar la direcciÃ³n pÃºblica del backend.
 
-- problemática, propuesta, alcance y MVP;
-- roles y responsabilidades;
-- circuito de órdenes de trabajo;
-- estados y transiciones;
-- modelo conceptual y modelo relacional;
-- esquema SQL para H2;
-- arquitectura general;
-- módulos del MVP y funcionalidades complementarias;
-- planificación del desarrollo.
+En producciÃ³n:
 
-La implementación del backend y frontend se realizará progresivamente de acuerdo con el plan de trabajo.
+```text
+https://tf-gestion-taller-mecanico-production.up.railway.app/api
+```
 
-## Integrantes
+El archivo `frontend/vercel.json` contiene la configuraciÃ³n necesaria para que React Router funcione correctamente tambiÃ©n al acceder directamente o actualizar rutas internas.
 
-**Augusto Matías Cúneo Brouwer de Koning**  
-**Nicolás Azcuy**
+El despliegue utilizado para la entrega se realiza manualmente desde el directorio `frontend`:
 
-**Tutora:** Prof. María Candela Grosso
+```powershell
+pnpm dlx vercel --prod --token $env:VERCEL_TOKEN
+```
 
-## Instalación y ejecución
+El token utilizado para autenticarse en Vercel es privado y no forma parte del repositorio.
 
-El proyecto todavía se encuentra en etapa de diseño y planificación, por lo que actualmente no existen componentes ejecutables.
+---
+
+### Backend
+
+El backend se encuentra desplegado en Railway:
+
+```text
+https://tf-gestion-taller-mecanico-production.up.railway.app
+```
+
+La API pÃºblica se encuentra disponible en:
+
+```text
+https://tf-gestion-taller-mecanico-production.up.railway.app/api
+```
+
+En producciÃ³n se utiliza una base H2 almacenada en modo archivo sobre un volumen persistente de Railway:
+
+```text
+jdbc:h2:file:/data/taller
+```
+
+El directorio `/data` se encuentra asociado al volumen utilizado por el servicio, evitando perder los registros cuando la aplicaciÃ³n vuelve a desplegarse.
+
+La consola H2 permanece deshabilitada en producciÃ³n.
+
+Debido a que el repositorio contiene frontend, backend y documentaciÃ³n, el despliegue utilizado durante la entrega se realiza indicando expresamente que el directorio `backend` debe ser tratado como raÃ­z:
+
+```powershell
+railway up .\backend --path-as-root
+```
+
+---
+
+## 13. ConfiguraciÃ³n de CORS
+
+El backend admite solicitudes desde el frontend local y desde la aplicaciÃ³n publicada en Vercel.
+
+La configuraciÃ³n se controla mediante la variable:
+
+```text
+CORS_ALLOWED_ORIGINS
+```
+
+Entre los orÃ­genes utilizados durante el desarrollo y la puesta en producciÃ³n se encuentran:
+
+```text
+http://localhost:5173
+https://tf-gestion-taller-mecanico-frontend.vercel.app
+```
+
+---
+
+## 14. API REST
+
+La API se encuentra organizada por recursos.
+
+### Usuarios
+
+```text
+GET    /api/usuarios
+GET    /api/usuarios/{id}
+GET    /api/usuarios/mecanicos
+GET    /api/usuarios/roles
+POST   /api/usuarios
+PUT    /api/usuarios/{id}
+PATCH  /api/usuarios/{id}/activo
+```
+
+### Clientes
+
+```text
+GET    /api/clientes
+GET    /api/clientes/{id}
+POST   /api/clientes
+PUT    /api/clientes/{id}
+```
+
+Las consultas permiten tambiÃ©n realizar bÃºsquedas mediante parÃ¡metros.
+
+### VehÃ­culos
+
+```text
+GET    /api/vehiculos
+GET    /api/vehiculos/{id}
+POST   /api/vehiculos
+PUT    /api/vehiculos/{id}
+```
+
+TambiÃ©n pueden consultarse vehÃ­culos por cliente y realizar bÃºsquedas mediante parÃ¡metros.
+
+### Ã“rdenes de trabajo
+
+```text
+GET    /api/ordenes
+POST   /api/ordenes
+GET    /api/ordenes/{id}
+
+PUT    /api/ordenes/{id}/estado
+PUT    /api/ordenes/{id}/tecnica
+PUT    /api/ordenes/{id}/mecanico
+
+GET    /api/ordenes/{id}/historial
+
+POST   /api/ordenes/{id}/trabajos
+GET    /api/ordenes/{id}/trabajos
+
+GET    /api/ordenes/vehiculo/{idVehiculo}
+```
+
+---
+
+## 15. Manejo de errores
+
+El backend implementa un manejo centralizado de excepciones mediante un controlador global.
+
+Las solicitudes invÃ¡lidas y las operaciones que incumplen reglas de negocio son rechazadas mediante respuestas HTTP adecuadas.
+
+Por ejemplo, cuando el cuerpo de una solicitud contiene un JSON invÃ¡lido, la API responde con estado `400 Bad Request` y una estructura informativa:
+
+```json
+{
+  "error": "JSON_INVALIDO",
+  "detalle": "El cuerpo JSON no es valido o contiene una codificacion incorrecta."
+}
+```
+
+Este criterio permite evitar que los errores internos del backend se trasladen directamente al cliente y facilita el tratamiento de respuestas desde el frontend.
+
+---
+
+## 16. Pruebas
+
+El backend cuenta con pruebas automatizadas sobre los principales servicios y reglas de negocio.
+
+La versiÃ³n final fue validada mediante la suite de tests del proyecto y mediante pruebas funcionales sobre la aplicaciÃ³n desplegada.
+
+Durante la validaciÃ³n integral se comprobÃ³ el circuito completo:
+
+```text
+Usuario
+  â†“
+Cliente
+  â†“
+VehÃ­culo
+  â†“
+Orden de trabajo
+  â†“
+AsignaciÃ³n de mecÃ¡nico
+  â†“
+DiagnÃ³stico
+  â†“
+Trabajo realizado
+  â†“
+Cambios de estado
+  â†“
+Control final
+  â†“
+FinalizaciÃ³n
+  â†“
+Entrega
+  â†“
+Historial de intervenciones
+```
+
+TambiÃ©n se comprobaron las restricciones de roles, las transiciones vÃ¡lidas e invÃ¡lidas, la persistencia de diagnÃ³sticos y trabajos, el historial de estados y la consulta del historial de cada vehÃ­culo.
+
+---
+
+## 17. Limitaciones del MVP
+
+El objetivo del proyecto fue completar correctamente el circuito principal de gestiÃ³n y trazabilidad. Por ese motivo, algunas funcionalidades previstas durante las primeras etapas fueron deliberadamente dejadas fuera del producto final.
+
+La versiÃ³n actual no incorpora autenticaciÃ³n real, gestiÃ³n de turnos, dashboard, presupuestos, control de stock, facturaciÃ³n ni portal para clientes.
+
+Estas funcionalidades no son necesarias para demostrar el problema central abordado y pueden incorporarse en futuras iteraciones sin modificar la base conceptual de la soluciÃ³n.
+
+---
+
+## 18. Posibles evoluciones
+
+Una evoluciÃ³n natural del sistema podrÃ­a incorporar autenticaciÃ³n y autorizaciÃ³n mediante sesiones o tokens, gestiÃ³n de turnos, presupuestos, repuestos, archivos asociados a Ã³rdenes, reportes, notificaciones y acceso para clientes.
+
+TambiÃ©n podrÃ­a reemplazarse H2 por un motor de base de datos orientado a un entorno productivo de mayor escala e incorporarse un proceso automatizado de integraciÃ³n y despliegue continuo.
+
+---
+
+## 19. Estado del proyecto
+
+La versiÃ³n final integrada en `main` contiene el frontend, el backend, la persistencia, las reglas de negocio, las pruebas y la configuraciÃ³n necesaria para su despliegue.
+
+El sistema se encuentra operativo online y permite ejecutar de manera completa el circuito principal definido para el Trabajo Final.
+
+MiTaller alcanza asÃ­ el objetivo planteado: disponer de una aplicaciÃ³n web funcional capaz de centralizar la gestiÃ³n de las reparaciones y conservar la trazabilidad de las intervenciones realizadas sobre cada vehÃ­culo.
