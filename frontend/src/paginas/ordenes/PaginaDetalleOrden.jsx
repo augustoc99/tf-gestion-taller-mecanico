@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import api from '../../api/axios';
 import FormTrabajo from '../../componentes/ordenes/FormTrabajo';
 import SelectorEstado from '../../componentes/ordenes/SelectorEstado';
+import EtiquetaEstado from '../../componentes/comunes/EtiquetaEstado';
 
 function obtenerMensajeError(error) {
   const data = error?.response?.data;
@@ -249,7 +250,7 @@ export default function PaginaDetalleOrden() {
 
       <section style={{ border: '1px solid #ddd', padding: 12, marginBottom: 16 }}>
         <h2>Datos</h2>
-        <p><b>Estado:</b> {orden.estado.replaceAll('_', ' ')}</p>
+        <p><b>Estado:</b> <EtiquetaEstado estado={orden.estado} /></p>
         <p><b>Vehículo:</b> {orden.patenteVehiculo}</p>
         <p><b>Cliente:</b> {orden.nombreCliente}</p>
         <p><b>Mecánico:</b> {orden.nombreMecanico ?? 'sin asignar'}</p>
@@ -384,7 +385,7 @@ export default function PaginaDetalleOrden() {
               {historial.map((item) => (
                 <tr key={item.idHistorial}>
                   <td>{item.fechaCambio?.replace('T', ' ').slice(0, 16) ?? '—'}</td>
-                  <td>{item.estadoAnterior?.replaceAll('_', ' ') ?? '—'}</td>
+                  <td>{item.estadoAnterior ? <EtiquetaEstado estado={item.estadoAnterior} /> : '—'}</td>
                   <td>{item.estadoNuevo.replaceAll('_', ' ')}</td>
                   <td>{item.nombreUsuario} ({item.rolUsuario})</td>
                   <td>{item.observacion ?? '—'}</td>

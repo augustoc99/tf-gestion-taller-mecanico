@@ -11,24 +11,6 @@
   line-height: 1.4;
 }
 
-.cabecera-modulo {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: flex-start;
-  margin-bottom: 24px;
-}
-
-.boton-enlace {
-  display: inline-block;
-  padding: 9px 14px;
-  border: 1px solid #777;
-  border-radius: 3px;
-  color: #111;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
 .buscador-clientes {
   margin-bottom: 22px;
 }
@@ -64,34 +46,6 @@
   padding: 8px 12px;
 }
 
-.tabla-responsive {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.tabla-clientes {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tabla-clientes th,
-.tabla-clientes td {
-  padding: 9px 10px;
-  border: 1px solid #999;
-  text-align: left;
-  vertical-align: top;
-}
-
-.tabla-clientes th {
-  background: #f4f4f4;
-}
-
-.mensaje-error {
-  padding: 10px 12px;
-  border: 1px solid #b54747;
-  background: #fff5f5;
-}
-
 .pagina-formulario-cliente {
   max-width: 720px;
 }
@@ -113,7 +67,6 @@
 }
 
 @media (max-width: 700px) {
-  .cabecera-modulo,
   .fila-busqueda {
     flex-direction: column;
   }

@@ -84,7 +84,7 @@ export default function PaginaListaVehiculos() {
           <p>Alta, consulta y modificación de vehículos asociados a clientes.</p>
         </div>
 
-        <Link className="boton-enlace" to="/vehiculos/nuevo">
+        <Link className="boton-primario" to="/vehiculos/nuevo">
           + Nuevo vehículo
         </Link>
       </div>
@@ -116,7 +116,7 @@ export default function PaginaListaVehiculos() {
         </label>
 
         <div className="acciones-filtros">
-          <button type="submit">Buscar</button>
+          <button type="submit" className="boton-primario">Buscar</button>
           <button type="button" onClick={limpiarFiltros}>Limpiar</button>
         </div>
       </form>
@@ -129,43 +129,45 @@ export default function PaginaListaVehiculos() {
         <p>No se encontraron vehículos.</p>
       ) : (
         <div className="tabla-responsive">
-          <table className="tabla-vehiculos">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Patente</th>
-                <th>Marca</th>
-                <th>Modelo</th>
-                <th>Año</th>
-                <th>Cliente</th>
-                <th>DNI/CUIT</th>
-                <th></th>
+          <div className="tabla-contenedor">
+            <table className="tabla">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Patente</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Año</th>
+                  <th>Cliente</th>
+                  <th>DNI/CUIT</th>
+                  <th style={{ textAlign: 'right' }}>Acciones</th>
               </tr>
             </thead>
 
             <tbody>
               {vehiculos.map((vehiculo) => (
                 <tr key={vehiculo.idVehiculo}>
-                  <td>{vehiculo.idVehiculo}</td>
-                  <td>{vehiculo.patente}</td>
-                  <td>{vehiculo.marca}</td>
-                  <td>{vehiculo.modelo}</td>
-                  <td>{vehiculo.anio ?? '—'}</td>
-                  <td>{vehiculo.nombreCliente}</td>
-                  <td>{vehiculo.dniCuitCliente || '—'}</td>
-                  <td>
-                    <Link to={`/vehiculos/${vehiculo.idVehiculo}/editar`}>
-                      Editar
-                    </Link>
-                    {' | '}
-                    <Link to={`/vehiculos/${vehiculo.idVehiculo}/historial`}>
-                      Historial
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <td className="texto-mono" style={{ fontWeight: 700 }}>{vehiculo.idVehiculo}</td>
+                    <td className="texto-mono" style={{ fontWeight: 700 }}>{vehiculo.patente}</td>
+                    <td>{vehiculo.marca}</td>
+                    <td>{vehiculo.modelo}</td>
+                    <td className="texto-mono">{vehiculo.anio ?? '—'}</td>
+                    <td>{vehiculo.nombreCliente}</td>
+                    <td className="texto-mono">{vehiculo.dniCuitCliente || '—'}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Link to={`/vehiculos/${vehiculo.idVehiculo}/editar`} className="link-boton">
+                        Editar
+                      </Link>
+                      {' '}
+                      <Link to={`/vehiculos/${vehiculo.idVehiculo}/historial`} className="link-boton">
+                        Historial
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </main>

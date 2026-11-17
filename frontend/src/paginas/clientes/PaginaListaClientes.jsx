@@ -67,9 +67,9 @@ export default function PaginaListaClientes() {
         <div>
           <h1>Clientes</h1>
           <p>Alta, consulta y modificación de clientes del taller.</p>
-        </div>
+                </div>
 
-        <Link className="boton-enlace" to="/clientes/nuevo">
+        <Link className="boton-primario" to="/clientes/nuevo">
           + Nuevo cliente
         </Link>
       </div>
@@ -86,10 +86,8 @@ export default function PaginaListaClientes() {
             placeholder="Ej.: Juan Perez o 30111222"
           />
 
-          <button type="submit">Buscar</button>
-          <button type="button" onClick={limpiarBusqueda}>
-            Limpiar
-          </button>
+          <button type="submit" className="boton-primario">Buscar</button>
+          <button type="button" onClick={limpiarBusqueda}>Limpiar</button>
         </div>
       </form>
 
@@ -101,37 +99,39 @@ export default function PaginaListaClientes() {
         <p>No se encontraron clientes.</p>
       ) : (
         <div className="tabla-responsive">
-          <table className="tabla-clientes">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>DNI/CUIT</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Dirección</th>
-                <th></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {clientes.map((cliente) => (
-                <tr key={cliente.idCliente}>
-                  <td>{cliente.idCliente}</td>
-                  <td>{cliente.nombre}</td>
-                  <td>{cliente.dniCuit || '—'}</td>
-                  <td>{cliente.telefono || '—'}</td>
-                  <td>{cliente.email || '—'}</td>
-                  <td>{cliente.direccion || '—'}</td>
-                  <td>
-                    <Link to={`/clientes/${cliente.idCliente}/editar`}>
-                      Editar
-                    </Link>
-                  </td>
+          <div className="tabla-contenedor">
+            <table className="tabla">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>DNI/CUIT</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Dirección</th>
+                  <th style={{ textAlign: 'right' }}></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {clientes.map((cliente) => (
+                  <tr key={cliente.idCliente}>
+                    <td className="texto-mono" style={{ fontWeight: 700 }}>{cliente.idCliente}</td>
+                    <td>{cliente.nombre}</td>
+                    <td className="texto-mono">{cliente.dniCuit || '—'}</td>
+                    <td>{cliente.telefono || '—'}</td>
+                    <td>{cliente.email || '—'}</td>
+                    <td>{cliente.direccion || '—'}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Link to={`/clientes/${cliente.idCliente}/editar`} className="link-boton">
+                        Editar
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </main>
