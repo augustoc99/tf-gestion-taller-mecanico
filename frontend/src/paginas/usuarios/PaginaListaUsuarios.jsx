@@ -95,7 +95,7 @@ export default function PaginaListaUsuarios() {
           <p>Gestión de recepción, administración y mecánicos del taller.</p>
         </div>
 
-        <Link className="boton-enlace" to="/usuarios/nuevo">
+        <Link className="boton-primario" to="/usuarios/nuevo">
           + Nuevo usuario
         </Link>
       </div>
@@ -121,54 +121,56 @@ export default function PaginaListaUsuarios() {
         <p>No se encontraron usuarios.</p>
       ) : (
         <div className="tabla-responsive">
-          <table className="tabla-usuarios">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Fecha de creación</th>
-                <th></th>
-              </tr>
-            </thead>
+          <div className="tabla-contenedor">
+            <table className="tabla">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Fecha de creación</th>
+                  <th style={{ textAlign: 'right' }}>Acciones</th>
+                </tr>
+              </thead>
 
             <tbody>
               {usuarios.map((usuario) => (
-                <tr key={usuario.idUsuario}>
-                  <td>{usuario.idUsuario}</td>
-                  <td>{usuario.nombreCompleto}</td>
-                  <td>{usuario.email || '—'}</td>
-                  <td>{etiquetaRol(usuario.rol)}</td>
-                  <td>{usuario.activo ? 'Activo' : 'Inactivo'}</td>
-                  <td>
-                    {usuario.fechaCreacion
-                      ? new Date(usuario.fechaCreacion).toLocaleString()
-                      : '—'}
-                  </td>
-                  <td className="acciones-usuario">
-                    <Link to={`/usuarios/${usuario.idUsuario}/editar`}>
-                      Editar
-                    </Link>
-
-                    <button
-                      type="button"
-                      className="boton-texto"
-                      disabled={cambiandoEstado === usuario.idUsuario}
-                      onClick={() => cambiarEstado(usuario)}
-                    >
-                      {cambiandoEstado === usuario.idUsuario
-                        ? 'Actualizando...'
-                        : usuario.activo
-                          ? 'Desactivar'
-                          : 'Activar'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  <tr key={usuario.idUsuario}>
+                    <td className="texto-mono" style={{ fontWeight: 700 }}>{usuario.idUsuario}</td>
+                    <td>{usuario.nombreCompleto}</td>
+                    <td>{usuario.email || '—'}</td>
+                    <td>{etiquetaRol(usuario.rol)}</td>
+                    <td>{usuario.activo ? 'Activo' : 'Inactivo'}</td>
+                    <td className="texto-mono texto-muted">
+                      {usuario.fechaCreacion
+                        ? new Date(usuario.fechaCreacion).toLocaleString()
+                        : '—'}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Link to={`/usuarios/${usuario.idUsuario}/editar`} className="link-boton">
+                        Editar
+                      </Link>
+                      {' '}
+                      <button
+                        type="button"
+                        className="link-boton"
+                        disabled={cambiandoEstado === usuario.idUsuario}
+                        onClick={() => cambiarEstado(usuario)}
+                      >
+                        {cambiandoEstado === usuario.idUsuario
+                          ? 'Actualizando...'
+                          : usuario.activo
+                            ? 'Desactivar'
+                            : 'Activar'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </main>

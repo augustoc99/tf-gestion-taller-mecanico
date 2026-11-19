@@ -32,45 +32,6 @@
   font: inherit;
 }
 
-.tabla-usuarios {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tabla-usuarios th,
-.tabla-usuarios td {
-  padding: 9px 10px;
-  border: 1px solid #999;
-  text-align: left;
-  vertical-align: top;
-}
-
-.tabla-usuarios th {
-  background: #f4f4f4;
-}
-
-.acciones-usuario {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.boton-texto {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: #0645ad;
-  text-decoration: underline;
-  cursor: pointer;
-  font: inherit;
-}
-
-.boton-texto:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
 .pagina-formulario-usuario {
   max-width: 720px;
 }

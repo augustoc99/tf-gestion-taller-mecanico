@@ -46,23 +46,6 @@
   padding: 8px 12px;
 }
 
-.tabla-vehiculos {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tabla-vehiculos th,
-.tabla-vehiculos td {
-  padding: 9px 10px;
-  border: 1px solid #999;
-  text-align: left;
-  vertical-align: top;
-}
-
-.tabla-vehiculos th {
-  background: #f4f4f4;
-}
-
 .pagina-formulario-vehiculo {
   max-width: 720px;
 }

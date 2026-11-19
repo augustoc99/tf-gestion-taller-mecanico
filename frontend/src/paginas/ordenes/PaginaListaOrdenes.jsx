@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
+import EtiquetaEstado from '../../componentes/comunes/EtiquetaEstado';
 
 const ESTADOS = [
   'RECIBIDO', 'EN_DIAGNOSTICO', 'EN_REPARACION',
@@ -51,30 +52,36 @@ export default function PaginaListaOrdenes() {
       {ordenes.length === 0 ? (
         <p>No hay órdenes.</p>
       ) : (
-        <table border="1" cellPadding="8" style={{ borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Patente</th>
-              <th>Cliente</th>
-              <th>Estado</th>
-              <th>Fecha ingreso</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {ordenes.map((o) => (
-              <tr key={o.idOrden}>
-                <td>{o.idOrden}</td>
-                <td>{o.patenteVehiculo ?? '—'}</td>
-                <td>{o.nombreCliente ?? '—'}</td>
-                <td>{o.estado.replaceAll('_', ' ')}</td>
-                <td>{o.fechaIngreso?.replace('T', ' ').slice(0, 16) ?? '—'}</td>
-                <td><Link to={`/ordenes/${o.idOrden}`}>Ver</Link></td>
+        <div className="tabla-contenedor">
+          <table className="tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Patente</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Fecha ingreso</th>
+                <th style={{ textAlign: 'right' }}></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {ordenes.map((o) => (
+                <tr key={o.idOrden}>
+                  <td className="texto-mono" style={{ fontWeight: 700 }}>{o.idOrden}</td>
+                  <td>{o.patenteVehiculo ?? '—'}</td>
+                  <td>{o.nombreCliente ?? '—'}</td>
+                  <td><EtiquetaEstado estado={o.estado} /></td>
+                  <td className="texto-mono texto-muted">
+                    {o.fechaIngreso?.replace('T', ' ').slice(0, 16) ?? '—'}
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <Link to={`/ordenes/${o.idOrden}`} className="link-boton">Ver</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
